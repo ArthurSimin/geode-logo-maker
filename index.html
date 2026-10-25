@@ -1,0 +1,2804 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><title>Geode Logo Maker</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Design tokens (Geode palette) + base reset */
+:root {
+  --bg: #0c0811;
+  --p: #191023;
+  --p2: #322145;
+  --bd: #4b3168;
+  --tx: #f2f2f2;
+  --mu: #b197ce;
+  --ac: #ed8678;
+  --btn: #160503;
+  color-scheme: dark;
+  box-sizing: border-box;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  height: 100dvh;
+  background: var(--bg);
+  color: var(--tx);
+  font:
+    14px Poppins,
+    system-ui,
+    sans-serif;
+  display: grid;
+  grid-template-rows: 84px 1fr 40px;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+h3,
+.brand {
+  font-family: Quicksand, Poppins, sans-serif;
+}
+/* Buttons: same look as the Geode website nav buttons */
+button {
+  font: inherit;
+  background: var(--btn);
+  color: var(--ac);
+  border: 2px solid var(--btn);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 6px -1px #0003,
+    0 2px 4px -2px #0003;
+  transition:
+    color 0.15s,
+    background-color 0.15s,
+    border-color 0.15s;
+  user-select: none;
+}
+button:hover,
+button.pr:hover {
+  background: #fcebe9;
+  border-color: #fcebe9;
+  color: #11080f;
+}
+button:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  transform: none;
+}
+button.pr {
+  background: var(--ac);
+  border-color: var(--ac);
+  color: var(--btn);
+}
+button.on {
+  background: #cd98bd;
+  border-color: #cd98bd;
+  color: #11080f;
+}
+/* Header: animated Geode waves, brand and actions */
+header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 8px;
+  overflow: hidden;
+  z-index: 1;
+}
+.hw {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 25px;
+  margin-right: 12px;
+  color: #f2f2f2;
+  text-shadow: 0 2px 8px #0005;
+}
+.brand b {
+  font-weight: 700;
+}
+.brand span {
+  font-weight: 500;
+}
+.sp {
+  flex: 1;
+}
+header .ck {
+  background: var(--btn);
+  color: var(--ac);
+  padding: 7px 12px;
+  border-radius: 6px;
+  margin: 0;
+  box-shadow: 0 4px 6px -1px #0003;
+}
+.ck {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mu);
+  cursor: pointer;
+  margin: 0 6px;
+}
+.ck input {
+  accent-color: var(--ac);
+}
+/* Layout: toolbar | workspace | side panel */
+main {
+  display: grid;
+  grid-template-columns: 58px 1fr 312px;
+  min-height: 0;
+}
+#tl {
+  background: var(--p);
+  border-right: 1px solid var(--p2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  align-items: center;
+}
+#tl button {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+}
+#tl hr {
+  width: 26px;
+  border: 0;
+  border-top: 1px solid var(--p2);
+  margin: 2px 0;
+}
+/* Workspace: stack of svg frame (#fr), layers canvas (#cv) and overlay (#ov) */
+#ws {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  touch-action: none;
+}
+.wbg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 42%;
+  opacity: 0.14;
+  pointer-events: none;
+}
+#cv,
+#fr {
+  position: absolute;
+  animation: cvin 0.8s var(--ease) backwards;
+}
+#fr {
+  box-shadow:
+    0 0 0 1px #000,
+    0 8px 40px #000a;
+  background: conic-gradient(
+      #3b3b3b 25%,
+      #2c2c2c 0 50%,
+      #3b3b3b 0 75%,
+      #2c2c2c 0
+    )
+    0 0/24px 24px;
+}
+#ov {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+#em {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 64px;
+  text-align: center;
+  color: var(--mu);
+  pointer-events: none;
+}
+#em[hidden] {
+  display: none;
+}
+.zc {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  background: var(--p);
+  padding: 5px;
+  border-radius: 8px;
+  border: 1px solid var(--p2);
+}
+.zc button {
+  padding: 4px 9px;
+}
+#zl {
+  min-width: 50px;
+  text-align: center;
+  align-self: center;
+  color: var(--mu);
+}
+/* Side panel: layers list + properties */
+aside {
+  background: var(--p);
+  border-left: 1px solid var(--p2);
+  display: grid;
+  grid-template-rows: minmax(120px, 38%) 1fr;
+  min-height: 0;
+}
+aside > section {
+  overflow: auto;
+  padding: 12px 14px;
+  overflow-x: hidden;
+}
+aside > section + section {
+  border-top: 1px solid var(--p2);
+}
+h3 {
+  margin: 14px 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ac);
+  letter-spacing: 0.04em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+h3:first-child {
+  margin-top: 0;
+}
+/* Layer rows */
+.ly {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  background: var(--p2);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition:
+    transform 0.28s var(--spring),
+    background-color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.25s;
+}
+.ly:hover {
+  background: #3d2a54;
+}
+.ly.on {
+  border-color: var(--ac);
+  box-shadow: 0 8px 22px -10px #ed8678aa;
+}
+.ly.dt {
+  box-shadow: 0 -2px 0 var(--ac);
+}
+.ly img,
+.bgs {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  object-fit: contain;
+  background: conic-gradient(#555 25%, #3a3a3a 0 50%, #555 0 75%, #3a3a3a 0) 0
+    0/10px 10px;
+  flex: none;
+}
+.nm {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  outline: 0;
+}
+.nm[contenteditable="true"] {
+  background: #0006;
+  padding: 2px 4px;
+  border-radius: 4px;
+  text-overflow: clip;
+}
+.ib {
+  padding: 3px;
+  background: none;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--mu);
+}
+.ib:hover {
+  background: var(--bd);
+  border-color: var(--bd);
+  color: #fff;
+}
+.ib.off {
+  color: #6b5a80;
+}
+/* Form controls */
+.r {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+.r span {
+  width: 78px;
+  color: var(--mu);
+}
+.r input[type="range"] {
+  flex: 1;
+  accent-color: var(--ac);
+  min-width: 0;
+}
+.r output {
+  width: 38px;
+  text-align: right;
+  color: var(--mu);
+}
+.g2,
+.g3 {
+  display: grid;
+  gap: 6px;
+}
+.g2 {
+  grid-template-columns: 1fr 1fr;
+}
+.g3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.f {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--mu);
+  font-size: 11px;
+}
+input[type="number"],
+select,
+.hx {
+  background: var(--bg);
+  border: 2px solid var(--p2);
+  color: var(--tx);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font: inherit;
+  width: 100%;
+  min-width: 0;
+  font-size: 14px;
+}
+input[type="number"]:focus,
+select:focus,
+.hx:focus {
+  outline: 0;
+  border-color: var(--ac);
+}
+input[type="color"] {
+  width: 34px;
+  height: 30px;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+.cc {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex: 1;
+}
+.hx {
+  width: 90px;
+  text-transform: uppercase;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+}
+.tabs button {
+  flex: 1;
+  padding: 6px 4px;
+  min-width: 0;
+}
+.row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.row button {
+  padding: 5px 10px;
+}
+/* Gradient editor */
+.gb {
+  position: relative;
+  height: 26px;
+  border-radius: 6px;
+  border: 2px solid var(--p2);
+  margin: 16px 6px 12px;
+  cursor: copy;
+}
+.gs {
+  position: absolute;
+  top: -8px;
+  width: 14px;
+  height: 38px;
+  margin-left: -7px;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  box-shadow: 0 1px 4px #000a;
+  cursor: ew-resize;
+}
+.gs.on {
+  border-color: var(--ac);
+  box-shadow: 0 0 0 2px #000;
+}
+.pre {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.pre button {
+  height: 34px;
+  padding: 0;
+  border: 2px solid var(--p2);
+  color: #fff;
+  font-size: 11px;
+  text-shadow: 0 1px 2px #000;
+}
+.pre button:hover {
+  border-color: #fcebe9;
+  color: #fff;
+}
+.sw input {
+  display: none;
+}
+.sw i {
+  display: block;
+  width: 36px;
+  height: 20px;
+  background: var(--bg);
+  border: 2px solid var(--p2);
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+}
+.sw i:after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--mu);
+  transition:
+    left 0.3s var(--spring),
+    background-color 0.2s;
+}
+.sw input:checked + i {
+  background: var(--ac);
+  border-color: var(--ac);
+}
+.sw input:checked + i:after {
+  left: 18px;
+  background: var(--btn);
+}
+.mu {
+  color: var(--mu);
+}
+button,
+header .ck {
+  white-space: nowrap;
+}
+aside,
+main > * {
+  min-width: 0;
+}
+/* Footer credits */
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: var(--p);
+  border-top: 1px solid var(--p2);
+  color: var(--mu);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+footer b {
+  color: #f2f2f2;
+  font-family: Quicksand, Poppins, sans-serif;
+  font-weight: 700;
+}
+footer i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--bd);
+}
+footer svg {
+  width: 16px;
+  height: 16px;
+  fill: #fff;
+}
+footer img {
+  width: 22px;
+  height: 22px;
+  image-rendering: pixelated;
+  transition: transform 0.2s;
+}
+footer span:hover img {
+  animation: hop 0.5s;
+}
+@keyframes hop {
+  40% {
+    transform: translateY(-5px);
+  }
+}
+.t2 {
+  display: none;
+}
+a.lk {
+  font: inherit;
+  background: var(--btn);
+  color: var(--ac);
+  border: 2px solid var(--btn);
+  border-radius: 6px;
+  padding: 6px 12px;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  text-decoration: none;
+  box-shadow: 0 4px 6px -1px #0003;
+  transition:
+    color 0.15s,
+    background-color 0.15s,
+    border-color 0.15s;
+  white-space: nowrap;
+}
+a.lk:hover {
+  background: #fcebe9;
+  border-color: #fcebe9;
+  color: #11080f;
+}
+/* Animations (Apple-like springs) */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes cvin {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+@keyframes rowin {
+  from {
+    opacity: 0;
+    transform: translateX(-14px) scale(0.96);
+  }
+}
+@keyframes rowpop {
+  50% {
+    transform: scale(1.025);
+  }
+}
+@keyframes rowout {
+  to {
+    opacity: 0;
+    transform: translateX(18px) scale(0.94);
+  }
+}
+button,
+a.lk {
+  transition:
+    color 0.15s,
+    background-color 0.15s,
+    border-color 0.15s,
+    transform 0.28s var(--spring),
+    box-shadow 0.2s;
+}
+button:hover,
+a.lk:hover {
+  transform: translateY(-1px);
+}
+button:active,
+a.lk:active {
+  transform: scale(0.95);
+  transition-duration: 0.08s;
+}
+.ly:active {
+  transform: scale(0.985);
+}
+.ly.new {
+  animation: rowin 0.45s var(--spring) backwards;
+}
+.ly.pop {
+  animation: rowpop 0.38s var(--spring);
+}
+.ly.out {
+  animation: rowout 0.17s ease-in forwards;
+  pointer-events: none;
+}
+#pp.in > * {
+  animation: rise 0.42s var(--ease) backwards;
+}
+#pp.in > :nth-child(2) {
+  animation-delay: 0.04s;
+}
+#pp.in > :nth-child(3) {
+  animation-delay: 0.08s;
+}
+#pp.in > :nth-child(4) {
+  animation-delay: 0.12s;
+}
+#pp.in > :nth-child(5) {
+  animation-delay: 0.16s;
+}
+#pp.in > :nth-child(n + 6) {
+  animation-delay: 0.2s;
+}
+.brand,
+header > .sp ~ * {
+  animation: rise 0.7s var(--ease) backwards;
+}
+.fl,
+.fi {
+  display: none;
+}
+footer .fl {
+  color: var(--ac);
+  text-decoration: none;
+}
+footer .fl:hover {
+  text-decoration: underline;
+}
+/* Interactive tutorial: spotlight, card and fake smooth mouse */
+#tl [data-act="tour"] {
+  margin-top: auto;
+}
+#tour {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+#tour[hidden] {
+  display: none;
+}
+#tHole {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 12px;
+  box-shadow: 0 0 0 100vmax rgba(12, 8, 17, 0.7), 0 0 0 2px #ed8678;
+  transition: left 0.6s var(--ease), top 0.6s var(--ease), width 0.6s var(--ease), height 0.6s var(--ease);
+  pointer-events: none;
+}
+#tCard {
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: var(--p);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 16px 16px 14px;
+  box-shadow: 0 20px 50px -10px #000c;
+  transition: transform 0.6s var(--spring);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+#tCard.nt {
+  transition: none;
+}
+#tCard h4 {
+  margin: 2px 0 6px;
+  font: 700 17px Quicksand, Poppins, sans-serif;
+  padding-right: 22px;
+}
+#tCard p {
+  margin: 0 0 14px;
+  color: #d9cfe6;
+}
+.tc-step {
+  font-size: 11px;
+  color: var(--ac);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.tc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.tc-dots {
+  display: flex;
+  gap: 4px;
+}
+.tc-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bd);
+  transition: 0.3s;
+}
+.tc-dots i.on {
+  background: var(--ac);
+  width: 16px;
+}
+.tc-btns {
+  display: flex;
+  gap: 6px;
+}
+.tc-x {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  padding: 2px 6px;
+  background: none;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--mu);
+}
+#tRip {
+  position: fixed;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  border: 2px solid var(--ac);
+  opacity: 0;
+  pointer-events: none;
+}
+#tRip.go {
+  animation: ripple 0.65s ease-out;
+}
+@keyframes ripple {
+  from {
+    opacity: 0.9;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+#tCur {
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 6px #000a);
+  will-change: transform;
+}
+
+/* Responsive overrides. They live at the END on purpose: media rules must come after the base rules to win. */
+@media (max-width: 1100px) {
+  header button span {
+    display: none;
+  }
+  header button {
+    padding: 8px 10px;
+  }
+  .brand {
+    font-size: 20px;
+  }
+  header a.lk span {
+    display: none;
+  }
+  header a.lk {
+    padding: 8px 10px;
+  }
+}
+@media (max-width: 760px) {
+  body {
+    grid-template-rows: 64px 1fr 40px;
+  }
+  footer {
+    gap: 10px;
+    font-size: 12px;
+  }
+  .brand div {
+    display: none;
+  }
+  .brand svg {
+    width: 32px;
+    height: 32px;
+  }
+  main {
+    grid-template-columns: 52px 1fr;
+    grid-template-rows: 1fr 42%;
+  }
+  aside {
+    grid-column: 1/3;
+    border-left: 0;
+    border-top: 1px solid var(--p2);
+    grid-template-rows: minmax(80px, 34%) 1fr;
+  }
+  #tl {
+    padding: 6px;
+    gap: 4px;
+    overflow-y: auto;
+  }
+  #tl button {
+    width: 38px;
+    height: 38px;
+  }
+  header {
+    padding: 0 10px 6px;
+    gap: 6px;
+  }
+  header .ck {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  .zc {
+    bottom: 6px;
+  }
+  main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr) 42%;
+  }
+  aside {
+    grid-column: auto;
+  }
+  #tl {
+    flex-direction: row;
+    border-right: 0;
+    border-bottom: 1px solid var(--p2);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 8px;
+    height: 54px;
+    justify-content: flex-start;
+  }
+  #tl button {
+    flex: none;
+  }
+  #tl hr {
+    width: 0;
+    height: 26px;
+    border-top: 0;
+    border-left: 1px solid var(--p2);
+    margin: 0 2px;
+  }
+  input[type="number"],
+  select,
+  .hx {
+    font-size: 16px;
+  }
+  #tl > :first-child {
+    margin-left: auto;
+  }
+  #tl > :last-child {
+    margin-right: auto;
+  }
+}
+@media (max-width: 480px) {
+  header .ck .t1 {
+    display: none;
+  }
+  header .ck .t2 {
+    display: inline;
+  }
+}
+@media (max-width: 420px) {
+  #tl {
+    gap: 3px;
+  }
+  #tl button {
+    width: 34px;
+    height: 34px;
+  }
+  header {
+    gap: 4px;
+  }
+  header button,
+  header a.lk {
+    padding: 7px 8px;
+  }
+  header a.lk {
+    display: none;
+  }
+  footer .fl {
+    display: inline;
+  }
+  footer .fi {
+    display: block;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style></head><body>
+<header><svg width="0" height="0" style="position:absolute"><defs><g id="wv"><path d="M0 182L21.5 183.2C43 184.3 86 186.7 128.8 188C171.7 189.3 214.3 189.7 257.2 195.3C300 201 343 212 385.8 210C428.7 208 471.3 193 514.2 189.8C557 186.7 600 195.3 642.8 204C685.7 212.7 728.3 221.3 771.2 226.2C814 231 857 232 878.5 232.5L900 233L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z" fill="#f4d48e"><animate repeatCount="indefinite" attributeName="d" dur="20s" values=" M0 182L21.5 183.2C43 184.3 86 186.7 128.8 188C171.7 189.3 214.3 189.7 257.2 195.3C300 201 343 212 385.8 210C428.7 208 471.3 193 514.2 189.8C557 186.7 600 195.3 642.8 204C685.7 212.7 728.3 221.3 771.2 226.2C814 231 857 232 878.5 232.5L900 233L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 186L21.5 191.7C43 197.3 86 208.7 128.8 211.7C171.7 214.7 214.3 209.3 257.2 205.7C300 202 343 200 385.8 196.7C428.7 193.3 471.3 188.7 514.2 184.3C557 180 600 176 642.8 181C685.7 186 728.3 200 771.2 201.7C814 203.3 857 192.7 878.5 187.3L900 182L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 215L21.5 214.3C43 213.7 86 212.3 128.8 208C171.7 203.7 214.3 196.3 257.2 192.8C300 189.3 343 189.7 385.8 186.7C428.7 183.7 471.3 177.3 514.2 183C557 188.7 600 206.3 642.8 213.8C685.7 221.3 728.3 218.7 771.2 214C814 209.3 857 202.7 878.5 199.3L900 196L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 182L21.5 183.2C43 184.3 86 186.7 128.8 188C171.7 189.3 214.3 189.7 257.2 195.3C300 201 343 212 385.8 210C428.7 208 471.3 193 514.2 189.8C557 186.7 600 195.3 642.8 204C685.7 212.7 728.3 221.3 771.2 226.2C814 231 857 232 878.5 232.5L900 233L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z " keySplines=" 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1 " calcMode="spline"/></path><path d="M0 261L21.5 257C43 253 86 245 128.8 242.2C171.7 239.3 214.3 241.7 257.2 239.2C300 236.7 343 229.3 385.8 231.8C428.7 234.3 471.3 246.7 514.2 249C557 251.3 600 243.7 642.8 242.7C685.7 241.7 728.3 247.3 771.2 252.5C814 257.7 857 262.3 878.5 264.7L900 267L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z" fill="#f5ae7d"><animate repeatCount="indefinite" attributeName="d" dur="17s" values=" M0 261L21.5 257C43 253 86 245 128.8 242.2C171.7 239.3 214.3 241.7 257.2 239.2C300 236.7 343 229.3 385.8 231.8C428.7 234.3 471.3 246.7 514.2 249C557 251.3 600 243.7 642.8 242.7C685.7 241.7 728.3 247.3 771.2 252.5C814 257.7 857 262.3 878.5 264.7L900 267L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 212L21.5 217.3C43 222.7 86 233.3 128.8 243.5C171.7 253.7 214.3 263.3 257.2 257.8C300 252.3 343 231.7 385.8 229.7C428.7 227.7 471.3 244.3 514.2 249.3C557 254.3 600 247.7 642.8 241.3C685.7 235 728.3 229 771.2 225.7C814 222.3 857 221.7 878.5 221.3L900 221L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 226L21.5 231.7C43 237.3 86 248.7 128.8 246.2C171.7 243.7 214.3 227.3 257.2 222.8C300 218.3 343 225.7 385.8 235.3C428.7 245 471.3 257 514.2 253.7C557 250.3 600 231.7 642.8 231.8C685.7 232 728.3 251 771.2 253.3C814 255.7 857 241.3 878.5 234.2L900 227L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 261L21.5 257C43 253 86 245 128.8 242.2C171.7 239.3 214.3 241.7 257.2 239.2C300 236.7 343 229.3 385.8 231.8C428.7 234.3 471.3 246.7 514.2 249C557 251.3 600 243.7 642.8 242.7C685.7 241.7 728.3 247.3 771.2 252.5C814 257.7 857 262.3 878.5 264.7L900 267L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z " keySplines=" 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1 " calcMode="spline"/></path><path d="M0 268L21.5 269.2C43 270.3 86 272.7 128.8 275.3C171.7 278 214.3 281 257.2 285.8C300 290.7 343 297.3 385.8 296.8C428.7 296.3 471.3 288.7 514.2 280.3C557 272 600 263 642.8 266C685.7 269 728.3 284 771.2 285.3C814 286.7 857 274.3 878.5 268.2L900 262L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z" fill="#EC5F4F"><animate repeatCount="indefinite" attributeName="d" dur="22s" values=" M0 268L21.5 269.2C43 270.3 86 272.7 128.8 275.3C171.7 278 214.3 281 257.2 285.8C300 290.7 343 297.3 385.8 296.8C428.7 296.3 471.3 288.7 514.2 280.3C557 272 600 263 642.8 266C685.7 269 728.3 284 771.2 285.3C814 286.7 857 274.3 878.5 268.2L900 262L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 300L21.5 293.3C43 286.7 86 273.3 128.8 270C171.7 266.7 214.3 273.3 257.2 279C300 284.7 343 289.3 385.8 291.2C428.7 293 471.3 292 514.2 290.5C557 289 600 287 642.8 289.7C685.7 292.3 728.3 299.7 771.2 297.8C814 296 857 285 878.5 279.5L900 274L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 283L21.5 285.5C43 288 86 293 128.8 289.3C171.7 285.7 214.3 273.3 257.2 266.3C300 259.3 343 257.7 385.8 261.8C428.7 266 471.3 276 514.2 281.3C557 286.7 600 287.3 642.8 284.2C685.7 281 728.3 274 771.2 270.8C814 267.7 857 268.3 878.5 268.7L900 269L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 268L21.5 269.2C43 270.3 86 272.7 128.8 275.3C171.7 278 214.3 281 257.2 285.8C300 290.7 343 297.3 385.8 296.8C428.7 296.3 471.3 288.7 514.2 280.3C557 272 600 263 642.8 266C685.7 269 728.3 284 771.2 285.3C814 286.7 857 274.3 878.5 268.2L900 262L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z " keySplines=" 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1 " calcMode="spline"/></path><path d="M0 298L21.5 303C43 308 86 318 128.8 324.3C171.7 330.7 214.3 333.3 257.2 331.3C300 329.3 343 322.7 385.8 324.3C428.7 326 471.3 336 514.2 337.8C557 339.7 600 333.3 642.8 332.7C685.7 332 728.3 337 771.2 333.7C814 330.3 857 318.7 878.5 312.8L900 307L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z" fill="#D5404A"><animate repeatCount="indefinite" attributeName="d" dur="14s" values=" M0 298L21.5 303C43 308 86 318 128.8 324.3C171.7 330.7 214.3 333.3 257.2 331.3C300 329.3 343 322.7 385.8 324.3C428.7 326 471.3 336 514.2 337.8C557 339.7 600 333.3 642.8 332.7C685.7 332 728.3 337 771.2 333.7C814 330.3 857 318.7 878.5 312.8L900 307L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 325L21.5 321.8C43 318.7 86 312.3 128.8 313.3C171.7 314.3 214.3 322.7 257.2 324C300 325.3 343 319.7 385.8 320.3C428.7 321 471.3 328 514.2 327.5C557 327 600 319 642.8 313.7C685.7 308.3 728.3 305.7 771.2 304.7C814 303.7 857 304.3 878.5 304.7L900 305L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 303L21.5 308.2C43 313.3 86 323.7 128.8 323.2C171.7 322.7 214.3 311.3 257.2 309.8C300 308.3 343 316.7 385.8 320C428.7 323.3 471.3 321.7 514.2 322C557 322.3 600 324.7 642.8 327.2C685.7 329.7 728.3 332.3 771.2 335.2C814 338 857 341 878.5 342.5L900 344L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 298L21.5 303C43 308 86 318 128.8 324.3C171.7 330.7 214.3 333.3 257.2 331.3C300 329.3 343 322.7 385.8 324.3C428.7 326 471.3 336 514.2 337.8C557 339.7 600 333.3 642.8 332.7C685.7 332 728.3 337 771.2 333.7C814 330.3 857 318.7 878.5 312.8L900 307L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z " keySplines=" 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1 " calcMode="spline"/></path><path d="M0 383L21.5 382C43 381 86 379 128.8 379.7C171.7 380.3 214.3 383.7 257.2 377.5C300 371.3 343 355.7 385.8 353.3C428.7 351 471.3 362 514.2 366.5C557 371 600 369 642.8 371.5C685.7 374 728.3 381 771.2 384.2C814 387.3 857 386.7 878.5 386.3L900 386L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z" fill="#AD2F4F"><animate repeatCount="indefinite" attributeName="d" dur="11s" values=" M0 383L21.5 382C43 381 86 379 128.8 379.7C171.7 380.3 214.3 383.7 257.2 377.5C300 371.3 343 355.7 385.8 353.3C428.7 351 471.3 362 514.2 366.5C557 371 600 369 642.8 371.5C685.7 374 728.3 381 771.2 384.2C814 387.3 857 386.7 878.5 386.3L900 386L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 359L21.5 358.3C43 357.7 86 356.3 128.8 360.8C171.7 365.3 214.3 375.7 257.2 377C300 378.3 343 370.7 385.8 366.7C428.7 362.7 471.3 362.3 514.2 360.8C557 359.3 600 356.7 642.8 355.3C685.7 354 728.3 354 771.2 353.7C814 353.3 857 352.7 878.5 352.3L900 352L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 371L21.5 372.8C43 374.7 86 378.3 128.8 378.2C171.7 378 214.3 374 257.2 372.2C300 370.3 343 370.7 385.8 371.8C428.7 373 471.3 375 514.2 372.2C557 369.3 600 361.7 642.8 355.5C685.7 349.3 728.3 344.7 771.2 343.5C814 342.3 857 344.7 878.5 345.8L900 347L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 383L21.5 382C43 381 86 379 128.8 379.7C171.7 380.3 214.3 383.7 257.2 377.5C300 371.3 343 355.7 385.8 353.3C428.7 351 471.3 362 514.2 366.5C557 371 600 369 642.8 371.5C685.7 374 728.3 381 771.2 384.2C814 387.3 857 386.7 878.5 386.3L900 386L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z " keySplines=" 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1 " calcMode="spline"/></path><path d="M0 416L21.5 415.5C43 415 86 414 128.8 413C171.7 412 214.3 411 257.2 411.5C300 412 343 414 385.8 414C428.7 414 471.3 412 514.2 412.2C557 412.3 600 414.7 642.8 415.7C685.7 416.7 728.3 416.3 771.2 414C814 411.7 857 407.3 878.5 405.2L900 403L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z" fill="#7F213A"><animate repeatCount="indefinite" attributeName="d" dur="10s" values=" M0 416L21.5 415.5C43 415 86 414 128.8 413C171.7 412 214.3 411 257.2 411.5C300 412 343 414 385.8 414C428.7 414 471.3 412 514.2 412.2C557 412.3 600 414.7 642.8 415.7C685.7 416.7 728.3 416.3 771.2 414C814 411.7 857 407.3 878.5 405.2L900 403L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 405L21.5 403.5C43 402 86 399 128.8 400C171.7 401 214.3 406 257.2 407.3C300 408.7 343 406.3 385.8 405.8C428.7 405.3 471.3 406.7 514.2 407.3C557 408 600 408 642.8 410.5C685.7 413 728.3 418 771.2 419.5C814 421 857 419 878.5 418L900 417L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 386L21.5 391.5C43 397 86 408 128.8 409.8C171.7 411.7 214.3 404.3 257.2 404.8C300 405.3 343 413.7 385.8 413.2C428.7 412.7 471.3 403.3 514.2 402.7C557 402 600 410 642.8 408C685.7 406 728.3 394 771.2 390C814 386 857 390 878.5 392L900 394L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z ; M0 416L21.5 415.5C43 415 86 414 128.8 413C171.7 412 214.3 411 257.2 411.5C300 412 343 414 385.8 414C428.7 414 471.3 412 514.2 412.2C557 412.3 600 414.7 642.8 415.7C685.7 416.7 728.3 416.3 771.2 414C814 411.7 857 407.3 878.5 405.2L900 403L900 451L878.5 451C857 451 814 451 771.2 451C728.3 451 685.7 451 642.8 451C600 451 557 451 514.2 451C471.3 451 428.7 451 385.8 451C343 451 300 451 257.2 451C214.3 451 171.7 451 128.8 451C86 451 43 451 21.5 451L0 451Z " keySplines=" 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1; 0.364212423249 0 0.635787576751 1 " calcMode="spline"/></path></g></defs></svg><svg class="hw" viewBox="0 175 900 275" preserveAspectRatio="none"><use href="#wv" transform="rotate(180 450 312.5)"/></svg><div class="brand"><svg width="40" height="40" viewBox="0 0 696 698" fill="#f2f2f2"><path fill-rule="evenodd" d="M393.076 24.4223L372.884 9.00248C358.192 -2.21718 337.808 -2.2172 323.116 9.00246L16.9433 242.812C3.28395 253.243 -2.41995 271.086 2.656 287.506L120.413 668.435C125.723 685.612 141.605 697.326 159.584 697.326H536.416C554.395 697.326 570.277 685.612 575.587 668.435L693.344 287.506C698.42 271.086 692.716 253.243 679.057 242.812L650.835 221.26L618.374 323.385L529.198 613.394C525.713 624.725 515.245 632.458 503.39 632.458H190.61C178.755 632.458 168.287 624.725 164.802 613.394L67.1963 295.971C63.8815 285.191 67.6162 273.487 76.562 266.619L330.558 71.6226C331.579 70.8386 332.643 70.1371 333.739 69.5183L393.076 24.4223Z"/><path fill-rule="evenodd" d="M336.614 143.264C344.511 137.209 355.489 137.209 363.386 143.264L552.797 288.49C560.096 294.086 563.143 303.632 560.437 312.422L487.62 548.924C484.778 558.153 476.251 564.451 466.594 564.451H233.406C223.749 564.451 215.222 558.153 212.38 548.924L199.934 508.5H261.676C262.393 508.647 263.134 508.724 263.888 508.724H432.112C436.963 508.724 441.241 505.546 442.643 500.903L495.141 326.982C496.452 322.638 494.961 317.934 491.386 315.139L354.777 208.3C350.795 205.186 345.205 205.186 341.223 208.3L215.925 306.292L152.151 353.307L139.563 312.422C136.857 303.632 139.904 294.086 147.203 288.49L336.614 143.264Z"/></svg><div><b>Geode</b> <span>Logo Maker</span></div></div><div class="sp"></div>
+<button id="un" data-ic="M12.5,8C9.85,8 7.45,9 5.6,10.6L2,7V16H11L7.38,12.38C8.77,11.22 10.54,10.5 12.5,10.5C16.04,10.5 19.05,12.81 20.1,16L22.47,15.22C21.08,11.03 17.15,8 12.5,8Z"><span>Undo</span></button><button id="re" data-ic="M18.4,10.6C16.55,9 14.15,8 11.5,8C6.85,8 2.92,11.03 1.54,15.22L3.9,16C4.95,12.81 7.95,10.5 11.5,10.5C13.45,10.5 15.23,11.22 16.62,12.38L13,16H22V7L18.4,10.6Z"><span>Redo</span></button>
+<button id="im" data-ic="M18 15V18H15V20H18V23H20V20H23V18H20V15H18M13.3 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H19C20.1 3 21 3.9 21 5V13.3C20.4 13.1 19.7 13 19 13C17.9 13 16.8 13.3 15.9 13.9L14.5 12L11 16.5L8.5 13.5L5 18H13.1C13 18.3 13 18.7 13 19C13 19.7 13.1 20.4 13.3 21Z"><span>Import Image</span></button>
+<label class="ck"><input type="checkbox" id="tr"><span class="t1">Transparent BG</span><span class="t2">No BG</span></label><button id="ex" class="pr" data-ic="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"><span>Export PNG</span></button><a class="lk" href="https://geode-sdk.org/" target="_blank" rel="noopener noreferrer" title="Open the official Geode website"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-.30206 0-.60438.09583-.85742.28906L.5957 8.34375c-.4705.3593-.66703.97346-.49218 1.53906l4.05664 13.1211c.1829.59168.7303.99609 1.3496.99609h12.98047c.61931 0 1.1667-.40441 1.34961-.9961l4.05664-13.12109c.17485-.5656-.02168-1.17975-.49218-1.53906l-.97266-.74219-1.11914 3.51758-3.07031 9.99024c-.12005.3903-.48032.65624-.88868.65624H6.57813c-.40836 0-.76863-.26593-.88868-.65624l-3.36132-10.9336c-.11419-.37133.01411-.77514.32226-1.01172l8.74805-6.7168a.93.93 0 0 1 .10937-.07226L13.55273.82031l-.6953-.53125C12.60437.09583 12.30205 0 12 0m.06836 4.75781c-.16254 0-.32493.05197-.46094.15625l-6.52344 5.0039c-.25142.19277-.35688.52145-.26367.82423l.4336 1.4082 2.19726-1.61914 4.31445-3.37695c.13717-.10727.33159-.10727.46875 0l4.70508 3.68164c.12315.09628.17407.25661.1289.40625l-1.80858 5.99219c-.0483.15993-.19619.26953-.36329.26953H9.10352a.377.377 0 0 1-.07618-.0078H6.9004l.42774 1.39257c.0979.3179.39196.53516.7246.53516h8.0332c.33265 0 .62477-.21725.72266-.53516l2.50977-8.14648c.09321-.30278-.01225-.63146-.26367-.82422l-6.5254-5.00392c-.136-.10428-.29839-.15625-.46093-.15625Z" fill="currentColor"/></svg><span>geode-sdk.org</span></a></header>
+<main><nav id="tl">
+<button data-tool="v" title="Select / Transform (V)" data-ic="M13.64,21.97C13.14,22.21 12.54,22 12.31,21.5L10.13,16.76L7.62,18.78C7.45,18.92 7.24,19 7,19A1,1 0 0,1 6,18V3A1,1 0 0,1 7,2C7.24,2 7.47,2.09 7.64,2.23L7.65,2.22L19.14,11.86C19.57,12.22 19.62,12.85 19.27,13.27C19.12,13.45 18.91,13.57 18.7,13.61L15.54,14.23L17.74,18.96C18,19.46 17.76,20.05 17.26,20.28L13.64,21.97Z"></button>
+<button data-tool="h" title="Pan (H / hold Space)" data-ic="M13 24C9.74 24 6.81 22 5.6 19L2.57 11.37C2.26 10.58 3 9.79 3.81 10.05L4.6 10.31C5.16 10.5 5.62 10.92 5.84 11.47L7.25 15H8V3.25C8 2.56 8.56 2 9.25 2S10.5 2.56 10.5 3.25V12H11.5V1.25C11.5 .56 12.06 0 12.75 0S14 .56 14 1.25V12H15V2.75C15 2.06 15.56 1.5 16.25 1.5C16.94 1.5 17.5 2.06 17.5 2.75V12H18.5V5.75C18.5 5.06 19.06 4.5 19.75 4.5S21 5.06 21 5.75V16C21 20.42 17.42 24 13 24Z"></button><hr>
+<button data-act="import" title="Import image" data-ic="M18 15V18H15V20H18V23H20V20H23V18H20V15H18M13.3 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H19C20.1 3 21 3.9 21 5V13.3C20.4 13.1 19.7 13 19 13C17.9 13 16.8 13.3 15.9 13.9L14.5 12L11 16.5L8.5 13.5L5 18H13.1C13 18.3 13 18.7 13 19C13 19.7 13.1 20.4 13.3 21Z"></button>
+<button data-act="bg" title="Background" data-ic="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"></button><button data-act="fm" title="Frame (ring & panel)" data-ic="M8 3H16C18.76 3 21 5.24 21 8V16C21 18.76 18.76 21 16 21H8C5.24 21 3 18.76 3 16V8C3 5.24 5.24 3 8 3M8 5C6.34 5 5 6.34 5 8V16C5 17.66 6.34 19 8 19H16C17.66 19 19 17.66 19 16V8C19 6.34 17.66 5 16 5H8Z"></button><button data-act="bgi" title="Import background image" data-ic="M22,16V4A2,2 0 0,0 20,2H8A2,2 0 0,0 6,4V16A2,2 0 0,0 8,18H20A2,2 0 0,0 22,16M11,12L13.03,14.71L16,11L20,16H8M2,6V20A2,2 0 0,0 4,22H18V20H4V6"></button><hr>
+<button data-act="ctr" title="Center layer" data-ic="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M19,19H15V21H19A2,2 0 0,0 21,19V15H19M19,3H15V5H19V9H21V5A2,2 0 0,0 19,3M5,5H9V3H5A2,2 0 0,0 3,5V9H5M5,15H3V19A2,2 0 0,0 5,21H9V19H5V15Z"></button>
+<button data-act="cov" title="Fit layer to canvas" data-ic="M17 4H20C21.1 4 22 4.9 22 6V8H20V6H17V4M4 8V6H7V4H4C2.9 4 2 4.9 2 6V8H4M20 16V18H17V20H20C21.1 20 22 19.1 22 18V16H20M7 18H4V16H2V18C2 19.1 2.9 20 4 20H7V18M18 8H6V16H18V8Z"></button><button data-act="tour" title="Tutorial (?)" data-ic="M11,18H13V16H11V18M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,6A4,4 0 0,0 8,10H10A2,2 0 0,1 12,8A2,2 0 0,1 14,10C14,12 11,11.75 11,15H13C13,12.75 16,12.5 16,10A4,4 0 0,0 12,6Z"></button></nav>
+<div id="ws"><svg class="wbg" viewBox="0 0 900 450" preserveAspectRatio="none"><use href="#wv"/></svg><svg id="fr" viewBox="0 0 1024 1024" preserveAspectRatio="none"></svg><canvas id="cv" width="1024" height="1024"></canvas><canvas id="ov"></canvas><div id="em">Drop images here or click <b>Import Image</b></div>
+<div class="zc"><button data-z="-1" title="Zoom out" data-ic="M9,2A7,7 0 0,1 16,9C16,10.57 15.5,12 14.61,13.19L15.41,14H16L22,20L20,22L14,16V15.41L13.19,14.61C12,15.5 10.57,16 9,16A7,7 0 0,1 2,9A7,7 0 0,1 9,2M5,8V10H13V8H5Z"></button><span id="zl"></span><button data-z="1" title="Zoom in" data-ic="M9,2A7,7 0 0,1 16,9C16,10.57 15.5,12 14.61,13.19L15.41,14H16L22,20L20,22L14,16V15.41L13.19,14.61C12,15.5 10.57,16 9,16A7,7 0 0,1 2,9A7,7 0 0,1 9,2M8,5V8H5V10H8V13H10V10H13V8H10V5H8Z"></button><button data-z="fit">Fit</button><button data-z="100">100%</button><button id="snd" title="Sound effects"></button></div></div>
+<aside><section><h3>Layers</h3><div id="ll"></div></section><section id="pp"></section></aside></main><footer><span>Made by <svg viewBox="0 0 100 100"><path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z"/></svg><b>Claude</b></span><i></i><span>Idea by <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAXCAYAAADgKtSgAAABsElEQVR42r2Vvy8DYRzGPy8NicEgDaE56Vh/gIgbKBaSji0RE0Yx+bFYjAYLf4BJJBKjaNIEZbgaMNfWuBypnqSpKBav4dJzba91FfpM935/3fM++d5zYmVjU1IDEhA1ctdXKfoUBQF8mM+Yb69l+YvThPDxRwgo/fazod8DYA8/Pkr+0G7dIRIdBaDwlCOgKHU7WvhHNCCL9FRlZnQKz2YTmFfySafPAQiFxkBC+s5x9gB/UOG9VTaBufhhQaRHrZ2avzRF88plqNR2IDTucZQAJP6gQmJmHUA2h3kkFv7VADOj4w8qgMTM6CXW/6+5GB0Oy0BvoKEm49GAjjbbrA6GZmvLYjwav2JWcj+G6lnd1qG0j+qknYztLgCwv70NwNzaKgBHy3tWQSpebjt583vy1pLDz9UphBYv+2SKxSIA7fddAERl1eZZfaVYVrfedZN0ML8sWG1aHNQpjzsNaCdWvXAxzpFOtz+R8GCx0pMb+2zGlZVlMReUbqjFvwnlc640bUxOR6p4PD1kAeju67FjuYcst4s7FpV5VdQRz8FbfsoaqSqcadcgYEIddC3+AqYKi20ZPk72AAAAAElFTkSuQmCC" alt=""><b>Arthur</b></span><i class="fi"></i><a class="fl" href="https://geode-sdk.org/" target="_blank" rel="noopener noreferrer">geode-sdk.org</a></footer>
+<input type="file" id="fi" accept="image/*" multiple hidden><input type="file" id="bf" accept="image/*" hidden>
+<script>
+/*
+ * Geode Logo Maker — single-file editor.
+ *
+ * HOW THE PIECES FIT
+ *  - Everything is drawn in a fixed 1024x1024 "logo space" (S). Zoom/pan only changes how it is shown.
+ *  - Live preview = inline SVG (#fr: frame/ring/background, always crisp) + <canvas id=cv> (imported layers)
+ *    + <canvas id=ov> (selection box, handles, guides). The PNG export (render) redraws it all on one canvas.
+ *  - State is plain data (see DATA MODEL). renderUi() rebuilds the side panels from it, redraw() the picture.
+ *  - Undo/redo = JSON snapshots of that state (pushHistory / restoreSnapshot). Image pixels live outside the
+ *    state, in imageStore, and are referenced by key.
+ *
+ * DATA MODEL
+ *  layer  { id, name, k: imageStore key, x, y: centre in logo space, w, h: size, r: rotation (deg),
+ *           o: opacity 0-1, v: visible,
+ *           st: stroke  { on, t: width, ol: black outline width, c: colour, pos: 'out'|'in', q: quality 1-3 },
+ *           sd: shadow  { on, c, o: opacity, x, y: offset, b: blur } }
+ *  fill   { mode: 'none'|'solid'|'grad'|'img', color, t: 'linear'|'radial', a: angle (deg), s: [{p: 0-1, c}],
+ *           k: imageStore key, fit: 'fit'|'fill'|'stretch'|'center', x, y, sc: scale, r: rotation }
+ *  panelFill = the fill INSIDE the frame (what the user calls "background");  ringFill = the gradient ring;
+ *  frameOpts.on = frame on/off.  selection = layer id | 'bg' (panelFill) | 'rg' (ringFill) | null.
+ */
+const $ = (s) => document.querySelector(s),
+  $$ = (s) => [...document.querySelectorAll(s)],
+  S = 1024,
+  PI = Math.PI;
+const icon = (d) =>
+  `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="${d}"/></svg>`;
+$$("[data-ic]").forEach((b) => {
+  b.insertAdjacentHTML("afterbegin", icon(b.dataset.ic));
+  if (b.title) b.setAttribute("aria-label", b.title);
+});
+const ICON_EYE =
+    "M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z",
+  ICON_EYE_OFF =
+    "M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z",
+  ICON_COPY =
+    "M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z",
+  ICON_TRASH =
+    "M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z";
+const GRADIENT_PRESETS = [
+  ["Candy", 135, ["#f4a3b5", "#a99ad0", "#7fb4e6"]],
+  ["Sunset", 160, ["#7d2339", "#d8454c", "#f08a5f", "#f2d283"]],
+  ["Geode", 135, ["#2b2238", "#5b3f7a", "#c8374b"]],
+  ["Pastel", 135, ["#f9c6d3", "#a8e6cf", "#c6d8ff", "#fff1a8"]],
+  ["Ocean", 135, ["#1d4ed8", "#0d9488", "#10b981"]],
+  ["Rose", 90, ["#f87171", "#a78bfa", "#60a5fa"]],
+  ["Meadow", 180, ["#c6d8ff", "#b9d58a"]],
+];
+
+// ====================================================================================================
+// CONSTANTS & SHARED HELPERS (frame geometry, Geometry Dash preset, gradient maths)
+// ====================================================================================================
+const GD_STROKE = {
+    on: true,
+    t: 15,
+    ol: 20,
+    c: "#ffffff",
+    pos: "out",
+    q: 2,
+  },
+  GD_SHADOW = {
+    on: true,
+    c: "#000000",
+    o: 0.25,
+    x: 36,
+    y: 42,
+    b: 0,
+  };
+const FRAME = {
+    outer: [20, 195],
+    ring: [55, 160],
+    panel: [101, 124],
+  },
+  PANEL_SIZE = S - 2 * 101;
+const inset = (p, i) => p.x > i && p.x < S - i && p.y > i && p.y < S - i;
+const sortedStops = (f) => [...f.s].sort((a, b) => a.p - b.p);
+function gradLine(deg) {
+  const a = (deg * PI) / 180,
+    dx = Math.sin(a),
+    dy = -Math.cos(a),
+    k = ((Math.abs(dx) + Math.abs(dy)) * S) / 2;
+  return [S / 2 - dx * k, S / 2 - dy * k, S / 2 + dx * k, S / 2 + dy * k];
+}
+const evenStops = (s) =>
+  s.map((c, i) => ({
+    p: i / (s.length - 1),
+    c,
+  }));
+
+// ====================================================================================================
+// APPLICATION STATE
+// ====================================================================================================
+let layers = [],
+  selection = null,
+  selectedStop = 0,
+  activeTool = "v",
+  imageStore = {},
+  undoStack = [],
+  undoIndex = -1,
+  nextId = 1,
+  view = {
+    z: 0.6,
+    x: 0,
+    y: 0,
+  },
+  drag = null,
+  guides = [],
+  spaceHeld = false,
+  draggingStop = false,
+  draggedLayerId;
+const defaultFill = () => ({
+  mode: "solid",
+  color: "#c8374b",
+  t: "linear",
+  a: 135,
+  s: evenStops(GRADIENT_PRESETS[0][2]),
+  k: null,
+  fit: "fill",
+  x: 0,
+  y: 0,
+  sc: 1,
+  r: 0,
+});
+let frameOpts = {
+    on: 1,
+  },
+  panelFill = {
+    ...defaultFill(),
+    mode: "grad",
+    a: 33,
+    s: [
+      {
+        p: 0.25,
+        c: "#090d0a",
+      },
+      {
+        p: 0.9,
+        c: "#3d3a3b",
+      },
+    ],
+  },
+  ringFill = {
+    mode: "grad",
+    color: "#c8374b",
+    t: "linear",
+    a: 135,
+    s: [
+      {
+        p: 0.1,
+        c: "#fbd3d2",
+      },
+      {
+        p: 0.26,
+        c: "#f2a5b0",
+      },
+      {
+        p: 0.42,
+        c: "#d29dc1",
+      },
+      {
+        p: 0.58,
+        c: "#8e8bb7",
+      },
+      {
+        p: 0.7,
+        c: "#7ba3d0",
+      },
+      {
+        p: 0.9,
+        c: "#7aaad0",
+      },
+    ],
+    k: null,
+    fit: "fill",
+    x: 0,
+    y: 0,
+    sc: 1,
+    r: 0,
+  };
+const workspace = $("#ws"),
+  layerCanvas = $("#cv"),
+  layerCtx = layerCanvas.getContext("2d"),
+  currentLayer = () => layers.find((l) => l.id == selection);
+const hexToRgb = (h) => [1, 3, 5].map((i) => parseInt(h.substr(i, 2), 16) || 0),
+  rgbToHex = (a) =>
+    "#" +
+    a
+      .map((v) =>
+        Math.round(Math.max(0, Math.min(255, v)))
+          .toString(16)
+          .padStart(2, "0"),
+      )
+      .join("");
+const escapeHtml = (s) => s.replace(/[&<>"]/g, (c) => "&#" + c.charCodeAt(0) + ";");
+
+// ====================================================================================================
+// UNDO / REDO HISTORY
+// ====================================================================================================
+const snapshot = () =>
+  JSON.stringify({
+    L: layers,
+    bg: panelFill,
+    rg: ringFill,
+    fm: frameOpts,
+    sel: selection,
+    gs: selectedStop,
+  });
+function pushHistory() {
+  const s = snapshot();
+  if (s == undoStack[undoIndex]) return;
+  undoStack = undoStack.slice(0, undoIndex + 1);
+  undoStack.push(s);
+  if (undoStack.length > 100) undoStack.shift();
+  undoIndex = undoStack.length - 1;
+  syncHistoryButtons();
+}
+function syncHistoryButtons() {
+  $("#un").disabled = undoIndex < 1;
+  $("#re").disabled = undoIndex >= undoStack.length - 1;
+}
+function restoreSnapshot() {
+  const o = JSON.parse(undoStack[undoIndex]);
+  layers = o.L;
+  panelFill = o.bg;
+  ringFill = o.rg;
+  frameOpts = o.fm;
+  selection = o.sel;
+  selectedStop = o.gs;
+  renderUi();
+}
+const undo = () => {
+    if (undoIndex > 0) {
+      undoIndex--;
+      silentNextUi = true;
+      SND.undo();
+      restoreSnapshot();
+    }
+  },
+  redo = () => {
+    if (undoIndex < undoStack.length - 1) {
+      undoIndex++;
+      silentNextUi = true;
+      SND.redo();
+      restoreSnapshot();
+    }
+  };
+
+// ====================================================================================================
+// RENDERING: layer strokes/shadows, gradients, background fills
+// ====================================================================================================
+const makeCanvas = (w, h) => {
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  return c;
+};
+function tint(src, c, inv) {
+  const o = makeCanvas(S, S),
+    x = o.getContext("2d");
+  if (inv) {
+    x.fillStyle = c;
+    x.fillRect(0, 0, S, S);
+    x.globalCompositeOperation = "destination-out";
+    x.drawImage(src, 0, 0);
+  } else {
+    x.drawImage(src, 0, 0);
+    x.globalCompositeOperation = "source-in";
+    x.fillStyle = c;
+    x.fillRect(0, 0, S, S);
+  }
+  return o;
+}
+function dilate(src, r, n) {
+  const o = makeCanvas(S, S),
+    x = o.getContext("2d");
+  for (const k of [1, 0.55, 0.25]) {
+    const m = Math.ceil(n * (k > 0.5 ? 1 : 0.5));
+    for (let i = 0; i < m; i++) {
+      const a = (i / m) * 2 * PI;
+      x.drawImage(src, Math.cos(a) * r * k, Math.sin(a) * r * k);
+    }
+  }
+  x.drawImage(src, 0, 0);
+  return o;
+}
+function drawLayer(ctx, l, ex) {
+  const im = imageStore[l.k];
+  if (!im) return;
+  const lc = makeCanvas(S, S),
+    x = lc.getContext("2d");
+  x.imageSmoothingQuality = "high";
+  x.translate(l.x, l.y);
+  x.rotate((l.r * PI) / 180);
+  const an = !ex && enterAnim[l.id] ? Math.min(1, (performance.now() - enterAnim[l.id]) / 420) : 1,
+    ak = 0.86 + 0.14 * (1 + 2.70158 * Math.pow(an - 1, 3) + 1.70158 * Math.pow(an - 1, 2));
+  x.scale(ak, ak);
+  x.drawImage(im, -l.w / 2, -l.h / 2, l.w, l.h);
+  let o = lc;
+  const st = l.st;
+  if (st.on && st.t > 0) {
+    const q = ex ? 3 : st.q; // exports always use the best quality
+    const steps = (v) => Math.max(16, Math.min(200, Math.round(v * [1.2, 2.2, 3.4][q - 1])));
+    o = makeCanvas(S, S);
+    const ox = o.getContext("2d");
+    if (st.pos == "out") {
+      const w = st.ol || 0; // black outline sits between the image and the coloured stroke
+      ox.drawImage(dilate(tint(lc, st.c, false), st.t + w, steps(st.t + w)), 0, 0);
+      if (w > 0) ox.drawImage(dilate(tint(lc, "#000", false), w, steps(w)), 0, 0);
+      ox.drawImage(lc, 0, 0);
+    } else {
+      const band = dilate(tint(lc, st.c, true), st.t, steps(st.t)),
+        bx = band.getContext("2d");
+      bx.globalCompositeOperation = "destination-in";
+      bx.drawImage(lc, 0, 0);
+      ox.drawImage(lc, 0, 0);
+      ox.drawImage(band, 0, 0);
+    }
+  }
+  const sd = l.sd;
+  if (sd && sd.on) {
+    const sh = tint(o, sd.c, false);
+    ctx.save();
+    ctx.globalAlpha = l.o * sd.o * an;
+    if (sd.b > 0) ctx.filter = `blur(${sd.b}px)`;
+    ctx.drawImage(sh, sd.x, sd.y);
+    ctx.restore();
+  }
+  ctx.globalAlpha = l.o * an;
+  ctx.drawImage(o, 0, 0);
+  ctx.globalAlpha = 1;
+}
+function makeGradient(ctx, fill) {
+  let q;
+  if (fill.t == "radial") q = ctx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S * 0.7071);
+  else {
+    q = ctx.createLinearGradient(...gradLine(fill.a));
+  }
+  sortedStops(fill).forEach((s) => q.addColorStop(Math.min(1, Math.max(0, s.p)), s.c));
+  return q;
+}
+function paintBg(ctx, fill, B = S) {
+  if (!fill || fill.mode == "none") return;
+  if (fill.mode == "solid") {
+    ctx.fillStyle = fill.color;
+    ctx.fillRect(0, 0, S, S);
+  } else if (fill.mode == "grad") {
+    ctx.fillStyle = makeGradient(ctx, fill);
+    ctx.fillRect(0, 0, S, S);
+  } else {
+    ctx.fillStyle = fill.color;
+    ctx.fillRect(0, 0, S, S);
+    const im = imageStore[fill.k];
+    if (!im) return;
+    let sx = 1,
+      sy = 1;
+    const f = fill.fit;
+    if (f == "fit") sx = sy = Math.min(B / im.width, B / im.height);
+    else if (f == "fill") sx = sy = Math.max(B / im.width, B / im.height);
+    else if (f == "stretch") {
+      sx = B / im.width;
+      sy = B / im.height;
+    }
+    ctx.save();
+    ctx.imageSmoothingQuality = "high";
+    ctx.translate(S / 2 + fill.x, S / 2 + fill.y);
+    ctx.rotate((fill.r * PI) / 180);
+    ctx.scale(fill.sc, fill.sc);
+    ctx.drawImage(im, (-im.width * sx) / 2, (-im.height * sy) / 2, im.width * sx, im.height * sy);
+    ctx.restore();
+  }
+}
+const roundRect = (x, i, r) => x.roundRect(i, i, S - 2 * i, S - 2 * i, r);
+function drawFrame(x, pn) {
+  x.fillStyle = "#000";
+  x.beginPath();
+  roundRect(x, ...FRAME.outer);
+  roundRect(x, ...FRAME.panel);
+  x.fill(pn ? "nonzero" : "evenodd");
+  x.save();
+  x.beginPath();
+  roundRect(x, ...FRAME.ring);
+  roundRect(x, ...FRAME.panel);
+  x.clip("evenodd");
+  paintBg(x, ringFill);
+  x.restore();
+  if (pn) {
+    x.save();
+    x.beginPath();
+    roundRect(x, ...FRAME.panel);
+    x.clip();
+    paintBg(x, panelFill, PANEL_SIZE);
+    if (panelFill.mode == "solid") {
+      const g = x.createLinearGradient(0, FRAME.panel[0], 0, S - FRAME.panel[0]);
+      g.addColorStop(0, "rgba(255,255,255,0)");
+      g.addColorStop(1, "rgba(255,255,255,.035)");
+      x.fillStyle = g;
+      x.fillRect(0, 0, S, S);
+    }
+    x.restore();
+  }
+}
+// Full render, used ONLY by the PNG export. The live preview does not call this: it shows the frame as inline
+// SVG (syncFrameSvg) and draws just the layers on the canvas. Both read the same FRAME geometry.
+function render(ctx, ex) {
+  ctx.clearRect(0, 0, S, S);
+  const pn = !$("#tr").checked;
+  if (frameOpts.on) drawFrame(ctx, pn);
+  else if (pn) paintBg(ctx, panelFill);
+  for (const l of layers) if (l.v) drawLayer(ctx, l, ex);
+}
+const sceneCanvas = makeCanvas(S, S),
+  sceneCtx = sceneCanvas.getContext("2d");
+const redraw = () => {
+  sceneCtx.clearRect(0, 0, S, S);
+  for (const l of layers) if (l.v) drawLayer(sceneCtx, l, false);
+  layerCtx.clearRect(0, 0, layerCanvas.width, layerCanvas.height);
+  layerCtx.imageSmoothingQuality = "high";
+  layerCtx.drawImage(sceneCanvas, 0, 0, layerCanvas.width, layerCanvas.height);
+  syncFrameSvg();
+  drawOverlay();
+};
+
+// ====================================================================================================
+// VIEWPORT: zoom / pan / fit
+// ====================================================================================================
+// Besides positioning the canvas + SVG, this keeps the canvas backing store at 1-2x of its on-screen size
+// (power of two) so layers stay sharp when zoomed, without re-rendering on every tiny zoom step.
+function layoutView() {
+  const s = S * view.z + "px",
+    t = Math.min(2048, Math.max(256, 2 ** Math.ceil(Math.log2(S * view.z * (devicePixelRatio || 1))))),
+    st = {
+      width: s,
+      height: s,
+      left: view.x + "px",
+      top: view.y + "px",
+    };
+  Object.assign(layerCanvas.style, st);
+  Object.assign($("#fr").style, st);
+  $("#zl").textContent = Math.round(view.z * 100) + "%";
+  if (layerCanvas.width != t) {
+    layerCanvas.width = layerCanvas.height = t;
+    redraw();
+    return;
+  }
+  drawOverlay();
+}
+var userMovedView = false;
+function fitView() {
+  userMovedView = false;
+  view.z = (Math.min(workspace.clientWidth, workspace.clientHeight) * 0.86) / S;
+  view.x = (workspace.clientWidth - S * view.z) / 2;
+  view.y = (workspace.clientHeight - S * view.z) / 2;
+  layoutView();
+}
+function zoomAt(k, mx_, my_) {
+  userMovedView = true;
+  const z = Math.min(8, Math.max(0.1, view.z * k));
+  view.x = mx_ - ((mx_ - view.x) * z) / view.z;
+  view.y = my_ - ((my_ - view.y) * z) / view.z;
+  view.z = z;
+  layoutView();
+}
+workspace.addEventListener(
+  "wheel",
+  (e) => {
+    e.preventDefault();
+    const R = workspace.getBoundingClientRect();
+    zoomAt(Math.exp(-e.deltaY * 0.0015), e.clientX - R.left, e.clientY - R.top);
+  },
+  {
+    passive: false,
+  },
+);
+$$("[data-z]").forEach(
+  (b) =>
+    (b.onclick = () => {
+      const z = b.dataset.z,
+        w = workspace.clientWidth / 2,
+        h = workspace.clientHeight / 2;
+      tweenView(() => {
+        if (z == "fit") fitView();
+        else if (z == "100") {
+          zoomAt(1 / view.z, w, h);
+        } else zoomAt(z > 0 ? 1.25 : 0.8, w, h);
+      });
+    }),
+);
+const toCanvasPoint = (e) => {
+  const R = workspace.getBoundingClientRect();
+  return {
+    x: (e.clientX - R.left - view.x) / view.z,
+    y: (e.clientY - R.top - view.y) / view.z,
+  };
+};
+const toScreenPoint = (p) => ({
+  x: view.x + p.x * view.z,
+  y: view.y + p.y * view.z,
+});
+
+// ====================================================================================================
+// SELECTION OVERLAY (box, handles, snap guides)
+// ====================================================================================================
+function layerHandles(l) {
+  const a = (l.r * PI) / 180,
+    c = Math.cos(a),
+    s = Math.sin(a),
+    P = (x, y) => ({
+      x: l.x + x * c - y * s,
+      y: l.y + x * s + y * c,
+    }),
+    w = l.w / 2,
+    h = l.h / 2;
+  return {
+    c: [P(-w, -h), P(w, -h), P(w, h), P(-w, h)],
+    r: P(0, -h - 32 / view.z),
+  };
+}
+const HANDLE_RADIUS = matchMedia("(pointer:coarse)").matches ? 9 : 5;
+function drawOverlay() {
+  const c = $("#ov"),
+    x = c.getContext("2d"),
+    d = devicePixelRatio || 1,
+    W = workspace.clientWidth,
+    Hh = workspace.clientHeight;
+  if (c.width != W * d || c.height != Hh * d) {
+    c.width = W * d;
+    c.height = Hh * d;
+  }
+  x.setTransform(d, 0, 0, d, 0, 0);
+  x.clearRect(0, 0, W, Hh);
+  const l = currentLayer();
+  if (l && l.v && activeTool == "v") {
+    const h = layerHandles(l),
+      q = h.c.map(toScreenPoint),
+      r = toScreenPoint(h.r);
+    x.strokeStyle = "#ee6a58";
+    x.lineWidth = 1.5;
+    x.beginPath();
+    q.forEach((p, i) => (i ? x.lineTo(p.x, p.y) : x.moveTo(p.x, p.y)));
+    x.closePath();
+    x.stroke();
+    x.beginPath();
+    x.moveTo((q[0].x + q[1].x) / 2, (q[0].y + q[1].y) / 2);
+    x.lineTo(r.x, r.y);
+    x.stroke();
+    x.fillStyle = "#fff";
+    q.forEach((p) => {
+      x.fillRect(p.x - HANDLE_RADIUS, p.y - HANDLE_RADIUS, HANDLE_RADIUS * 2, HANDLE_RADIUS * 2);
+      x.strokeRect(p.x - HANDLE_RADIUS, p.y - HANDLE_RADIUS, HANDLE_RADIUS * 2, HANDLE_RADIUS * 2);
+    });
+    x.beginPath();
+    x.arc(r.x, r.y, HANDLE_RADIUS + 1, 0, 2 * PI);
+    x.fill();
+    x.stroke();
+    if (selectPulseStart) {
+      const p = (performance.now() - selectPulseStart) / 400;
+      if (p < 1) {
+        const e = 1 - Math.pow(1 - p, 3),
+          cx = (q[0].x + q[2].x) / 2,
+          cy = (q[0].y + q[2].y) / 2,
+          k = 1 + 0.09 * e;
+        x.globalAlpha = (1 - p) * 0.8;
+        x.lineWidth = 2;
+        x.beginPath();
+        q.forEach((P, i) => {
+          const X = cx + (P.x - cx) * k,
+            Y = cy + (P.y - cy) * k;
+          i ? x.lineTo(X, Y) : x.moveTo(X, Y);
+        });
+        x.closePath();
+        x.stroke();
+        x.globalAlpha = 1;
+      }
+    }
+  }
+  x.strokeStyle = "#ff4fd8";
+  x.lineWidth = 1;
+  guides.forEach((g) => {
+    x.beginPath();
+    if (g.x != null) {
+      const s = view.x + g.x * view.z;
+      x.moveTo(s, 0);
+      x.lineTo(s, Hh);
+    } else {
+      const s = view.y + g.y * view.z;
+      x.moveTo(0, s);
+      x.lineTo(W, s);
+    }
+    x.stroke();
+  });
+}
+function hitTestLayer(p) {
+  for (let i = layers.length - 1; i >= 0; i--) {
+    const l = layers[i];
+    if (!l.v) continue;
+    const a = (-l.r * PI) / 180,
+      dx = p.x - l.x,
+      dy = p.y - l.y,
+      x = dx * Math.cos(a) - dy * Math.sin(a),
+      y = dx * Math.sin(a) + dy * Math.cos(a);
+    if (Math.abs(x) <= l.w / 2 && Math.abs(y) <= l.h / 2) return l;
+  }
+}
+
+// ====================================================================================================
+// POINTER INTERACTION (move / scale / rotate / pan / pinch)
+// ====================================================================================================
+const touchPoints = new Map();
+let pinchState = null;
+function applyPinch() {
+  const a = [...touchPoints.values()],
+    d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]),
+    midX = (a[0][0] + a[1][0]) / 2,
+    midY = (a[0][1] + a[1][1]) / 2,
+    R = workspace.getBoundingClientRect();
+  view.x += midX - pinchState.mx;
+  view.y += midY - pinchState.my;
+  zoomAt(d / pinchState.d, midX - R.left, midY - R.top);
+  pinchState.d = d;
+  pinchState.mx = midX;
+  pinchState.my = midY;
+}
+workspace.onpointerdown = (e) => {
+  if (e.target.closest(".zc")) return;
+  workspace.setPointerCapture(e.pointerId);
+  touchPoints.set(e.pointerId, [e.clientX, e.clientY]);
+  if (touchPoints.size == 2) {
+    const a = [...touchPoints.values()];
+    if (drag && drag.m != "pan") pushHistory();
+    drag = null;
+    guides = [];
+    pinchState = {
+      d: Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]) || 1,
+      mx: (a[0][0] + a[1][0]) / 2,
+      my: (a[0][1] + a[1][1]) / 2,
+    };
+    return;
+  }
+  if (touchPoints.size > 2) return;
+  const p = toCanvasPoint(e),
+    l = currentLayer();
+  if (activeTool == "h" || spaceHeld || e.button == 1) {
+    drag = {
+      m: "pan",
+      sx: e.clientX,
+      sy: e.clientY,
+      vx: view.x,
+      vy: view.y,
+    };
+    return;
+  }
+  if (e.button) return;
+  const R = workspace.getBoundingClientRect(),
+    m = {
+      x: e.clientX - R.left,
+      y: e.clientY - R.top,
+    },
+    near = (a) => {
+      const s = toScreenPoint(a);
+      return Math.hypot(s.x - m.x, s.y - m.y) < (e.pointerType == "touch" ? 26 : 11);
+    };
+  if (l && l.v) {
+    const h = layerHandles(l);
+    if (near(h.r)) {
+      drag = {
+        m: "rot",
+      };
+      return;
+    }
+    if (h.c.some(near)) {
+      drag = {
+        m: "sc",
+        w: l.w,
+        h: l.h,
+        d: Math.hypot(p.x - l.x, p.y - l.y) || 1,
+      };
+      return;
+    }
+  }
+  const t = hitTestLayer(p);
+  if (t) {
+    if (selection != t.id) {
+      selection = t.id;
+      renderUi();
+    }
+    drag = {
+      m: "mv",
+      sx: p.x,
+      sy: p.y,
+      ox: t.x,
+      oy: t.y,
+    };
+  } else {
+    selection = frameOpts.on && !inset(p, FRAME.panel[0]) && inset(p, FRAME.outer[0]) ? "rg" : "bg";
+    renderUi();
+  }
+};
+function snapAxis(v, hw, T, ax) {
+  const thr = 8 / view.z;
+  for (const t of T)
+    for (const o of [-hw, 0, hw])
+      if (Math.abs(v + o - t) < thr) {
+        guides.push(
+          ax == "x"
+            ? {
+                x: t,
+              }
+            : {
+                y: t,
+              },
+        );
+        return t - o;
+      }
+  return v;
+}
+workspace.onpointermove = (e) => {
+  if (touchPoints.has(e.pointerId)) touchPoints.set(e.pointerId, [e.clientX, e.clientY]);
+  if (pinchState && touchPoints.size > 1) {
+    applyPinch();
+    return;
+  }
+  if (!drag) return;
+  const l = currentLayer();
+  if (drag.m == "pan") {
+    userMovedView = true;
+    view.x = drag.vx + e.clientX - drag.sx;
+    view.y = drag.vy + e.clientY - drag.sy;
+    layoutView();
+    return;
+  }
+  if (!l) return;
+  const p = toCanvasPoint(e);
+  if (drag.m == "mv") {
+    const a = (l.r * PI) / 180,
+      c = Math.abs(Math.cos(a)),
+      s = Math.abs(Math.sin(a));
+    guides = [];
+    let x = drag.ox + p.x - drag.sx,
+      y = drag.oy + p.y - drag.sy;
+    if (!e.altKey) {
+      x = snapAxis(x, (l.w * c + l.h * s) / 2, [0, S / 2, S], "x");
+      y = snapAxis(y, (l.w * s + l.h * c) / 2, [0, S / 2, S], "y");
+    }
+    l.x = x;
+    l.y = y;
+    if (guides.length && !wasSnapped) SND.snap();
+    wasSnapped = guides.length;
+  } else if (drag.m == "sc") {
+    const f = Math.max(0.02, Math.hypot(p.x - l.x, p.y - l.y) / drag.d);
+    l.w = drag.w * f;
+    l.h = drag.h * f;
+  } else {
+    let a = (Math.atan2(p.y - l.y, p.x - l.x) * 180) / PI + 90;
+    if (e.shiftKey) a = Math.round(a / 15) * 15;
+    l.r = Math.round(a * 10) / 10;
+  }
+  redraw();
+  syncInputs();
+};
+workspace.onpointerup = workspace.onpointercancel = (e) => {
+  if (!touchPoints.has(e.pointerId)) return;
+  touchPoints.delete(e.pointerId);
+  if (pinchState) {
+    if (touchPoints.size < 2) pinchState = null;
+    drag = null;
+    return;
+  }
+  if (drag && drag.m != "pan") pushHistory();
+  drag = null;
+  guides = [];
+  redraw();
+  renderUi();
+};
+workspace.ondragover = (e) => e.preventDefault();
+workspace.ondrop = (e) => {
+  e.preventDefault();
+  [...e.dataTransfer.files].forEach(importImageFile);
+};
+
+// ====================================================================================================
+// CENTERING (centres the VISIBLE pixels, ignoring transparent padding)
+// ====================================================================================================
+const bboxCache = {};
+function visibleCenterOffset(k) {
+  if (bboxCache[k]) return bboxCache[k];
+  const im = imageStore[k],
+    w = im.width,
+    h = im.height,
+    c = makeCanvas(w, h),
+    x = c.getContext("2d", {
+      willReadFrequently: true,
+    });
+  x.drawImage(im, 0, 0);
+  const d = x.getImageData(0, 0, w, h).data;
+  let x0 = w,
+    y0 = h,
+    x1 = -1,
+    y1 = -1;
+  for (let y = 0; y < h; y++)
+    for (let i = 0; i < w; i++)
+      if (d[(y * w + i) * 4 + 3] > 8) {
+        if (i < x0) x0 = i;
+        if (i > x1) x1 = i;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+  if (x1 < 0) {
+    x0 = 0;
+    y0 = 0;
+    x1 = w - 1;
+    y1 = h - 1;
+  }
+  return (bboxCache[k] = [(x0 + x1 + 1) / 2 - w / 2, (y0 + y1 + 1) / 2 - h / 2]);
+}
+function placeLayerCentered(l, m = "xy") {
+  const im = imageStore[l.k],
+    o = visibleCenterOffset(l.k),
+    a = (l.r * PI) / 180,
+    u = (o[0] * l.w) / im.width,
+    v = (o[1] * l.h) / im.height,
+    ox = u * Math.cos(a) - v * Math.sin(a),
+    oy = u * Math.sin(a) + v * Math.cos(a);
+  if (m.includes("x")) l.x = S / 2 - ox;
+  if (m.includes("y")) l.y = S / 2 - oy;
+}
+function centerLayer(l, m) {
+  if (l) {
+    placeLayerCentered(l, m);
+    pushHistory();
+    renderUi();
+  }
+}
+
+// ====================================================================================================
+// SOUND + ANIMATION HELPERS
+// ====================================================================================================
+// silentNextUi: renderUi() plays the 'select' sound and the selection animation whenever the selection changes.
+// Actions that already play their own sound (import, duplicate, delete, undo/redo) set this flag first so
+// the two sounds do not overlap. It is reset at the end of renderUi().
+var audioCtx,
+  masterGain,
+  soundOn = true,
+  silentNextUi = false,
+  lastSelection = null,
+  wasSnapped = 0,
+  selectPulseStart = 0,
+  justSelectedId = null;
+const renderedLayerIds = new Set(),
+  enterAnim = {},
+  ICON_VOLUME_ON =
+    "M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z",
+  ICON_VOLUME_OFF =
+    "M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z";
+try {
+  soundOn = localStorage.getItem("gsnd") != "0";
+} catch {}
+function unlockAudio() {
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const c = audioCtx.createDynamicsCompressor(),
+        f = audioCtx.createBiquadFilter();
+      f.type = "lowpass";
+      f.frequency.value = 5200;
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.55;
+      masterGain.connect(f);
+      f.connect(c);
+      c.connect(audioCtx.destination);
+    } catch {}
+  }
+  if (audioCtx && audioCtx.state == "suspended") audioCtx.resume();
+}
+["pointerdown", "keydown", "touchstart"].forEach((v) =>
+  addEventListener(v, unlockAudio, {
+    capture: true,
+    passive: true,
+  }),
+);
+function tone(fr, t = 0, d = 0.12, v = 0.05, ty = "sine", f2) {
+  const a = audioCtx;
+  if (!a || !soundOn || a.state != "running") return;
+  const o = a.createOscillator(),
+    g = a.createGain(),
+    n = a.currentTime + t;
+  o.type = ty;
+  o.frequency.setValueAtTime(fr, n);
+  if (f2) o.frequency.exponentialRampToValueAtTime(f2, n + d);
+  g.gain.setValueAtTime(0.0001, n);
+  g.gain.exponentialRampToValueAtTime(v, n + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, n + d);
+  o.connect(g);
+  g.connect(masterGain);
+  o.start(n);
+  o.stop(n + d + 0.03);
+}
+const SND = {
+  sel: () => {
+    tone(620, 0, 0.09, 0.05);
+    tone(1240, 0, 0.06, 0.015);
+  },
+  on: () => {
+    tone(520, 0, 0.08, 0.045);
+    tone(780, 0.06, 0.1, 0.045);
+  },
+  off: () => {
+    tone(780, 0, 0.08, 0.04);
+    tone(520, 0.06, 0.1, 0.04);
+  },
+  add: () => [523, 659, 784].forEach((f, i) => tone(f, i * 0.055, 0.18, 0.04, "triangle")),
+  del: () => tone(420, 0, 0.14, 0.05, "sine", 180),
+  dup: () => {
+    tone(700, 0, 0.06, 0.04);
+    tone(900, 0.06, 0.08, 0.04);
+  },
+  undo: () => tone(560, 0, 0.07, 0.04, "sine", 420),
+  redo: () => tone(420, 0, 0.07, 0.04, "sine", 560),
+  snap: () => tone(1500, 0, 0.03, 0.018),
+  done: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.07, 0.5, 0.045)),
+  tap: () => tone(480, 0, 0.05, 0.03),
+};
+const renderSoundIcon = () => ($("#snd").innerHTML = icon(soundOn ? ICON_VOLUME_ON : ICON_VOLUME_OFF));
+renderSoundIcon();
+$("#snd").onclick = () => {
+  soundOn = !soundOn;
+  try {
+    localStorage.setItem("gsnd", soundOn ? "1" : "0");
+  } catch {}
+  renderSoundIcon();
+  SND.on();
+};
+function animTick() {
+  redraw();
+  if (Object.keys(enterAnim).length) requestAnimationFrame(animTick);
+}
+function startSelectPulse() {
+  selectPulseStart = performance.now();
+  (function f() {
+    drawOverlay();
+    if (performance.now() - selectPulseStart < 400) requestAnimationFrame(f);
+    else {
+      selectPulseStart = 0;
+      drawOverlay();
+    }
+  })();
+}
+// Animates a view change: run the action once to learn the target view, rewind, then tween to it.
+function tweenView(fn) {
+  const s = {
+    ...view,
+  };
+  fn();
+  const t = {
+    ...view,
+  };
+  Object.assign(view, s);
+  const t0 = performance.now();
+  (function f(n) {
+    const k = Math.min(1, (n - t0) / 300),
+      e = 1 - Math.pow(1 - k, 3);
+    view.z = s.z + (t.z - s.z) * e;
+    view.x = s.x + (t.x - s.x) * e;
+    view.y = s.y + (t.y - s.y) * e;
+    layoutView();
+    if (k < 1) requestAnimationFrame(f);
+  })(t0);
+}
+
+// ====================================================================================================
+// IMAGE IMPORT + LAYER ACTIONS
+// ====================================================================================================
+function importImageFile(f) {
+  if (!f.type.startsWith("image")) return;
+  loadImageFile(f, (k, im) => {
+    const m = Math.min(640 / Math.max(im.width, im.height), 4),
+      l = {
+        id: "l" + nextId++,
+        name: f.name.replace(/\.[^.]+$/, ""),
+        k,
+        x: 512,
+        y: 512,
+        w: im.width * m,
+        h: im.height * m,
+        r: 0,
+        o: 1,
+        v: 1,
+        st: {
+          ...GD_STROKE,
+          on: false,
+        },
+        sd: {
+          ...GD_SHADOW,
+          on: false,
+        },
+      };
+    placeLayerCentered(l);
+    layers.push(l);
+    selection = l.id;
+    silentNextUi = true;
+    pushHistory();
+    enterAnim[l.id] = performance.now();
+    setTimeout(() => {
+      delete enterAnim[l.id];
+      redraw();
+    }, 460);
+    requestAnimationFrame(animTick);
+    SND.add();
+    renderUi();
+  });
+}
+function loadImageFile(f, cb) {
+  const im = new Image();
+  im.onload = () => {
+    const k = "i" + nextId++;
+    imageStore[k] = im;
+    cb(k, im);
+  };
+  im.src = URL.createObjectURL(f);
+}
+$("#fi").onchange = (e) => {
+  [...e.target.files].forEach(importImageFile);
+  e.target.value = "";
+};
+$("#bf").onchange = (e) => {
+  const f = e.target.files[0];
+  e.target.value = "";
+  if (f)
+    loadImageFile(f, (k) => {
+      const o = selection == "rg" ? ringFill : panelFill;
+      o.k = k;
+      o.mode = "img";
+      if (selection != "rg") selection = "bg";
+      pushHistory();
+      renderUi();
+    });
+};
+function duplicateLayer(l) {
+  if (!l) return;
+  const n = JSON.parse(JSON.stringify(l));
+  n.id = "l" + nextId++;
+  n.name = l.name + " copy";
+  n.x += 24;
+  n.y += 24;
+  layers.splice(layers.indexOf(l) + 1, 0, n);
+  selection = n.id;
+  silentNextUi = true;
+  SND.dup();
+  pushHistory();
+  renderUi();
+}
+function deleteLayer(l) {
+  const i = layers.indexOf(l);
+  if (i < 0) return;
+  layers.splice(i, 1);
+  selection = layers[Math.min(i, layers.length - 1)]?.id || null;
+  silentNextUi = true;
+  SND.del();
+  pushHistory();
+  renderUi();
+}
+
+// ====================================================================================================
+// LAYER LIST + UI REFRESH
+// ====================================================================================================
+function renderUi() {
+  const ch = selection !== lastSelection;
+  justSelectedId = ch ? selection : null;
+  lastSelection = selection;
+  if (ch && selection != null && !silentNextUi) SND.sel();
+  $("#ll").innerHTML =
+    [...layers]
+      .reverse()
+      .map(
+        (l) =>
+          `<div class="ly${l.id == selection ? " on" : ""}${renderedLayerIds.has(l.id) ? "" : " new"}${justSelectedId === l.id ? " pop" : ""}" draggable="true" data-id="${l.id}"><button class="ib${l.v ? "" : " off"}" data-a="eye">${icon(l.v ? ICON_EYE : ICON_EYE_OFF)}</button><img alt="" src="${imageStore[l.k].src}"><span class="nm">${escapeHtml(l.name)}</span><button class="ib" data-a="dup" title="Duplicate (Ctrl+D)">${icon(ICON_COPY)}</button><button class="ib" data-a="del" title="Delete">${icon(ICON_TRASH)}</button></div>`,
+      )
+      .join("") +
+    `<div class="ly bgr${selection == "rg" ? " on" : ""}" data-id="rg"><span class="bgs" style="background:${fillToCss(ringFill)}"></span><span class="nm">Frame ring</span></div><div class="ly bgr${selection == "bg" ? " on" : ""}" data-id="bg"><span class="bgs" style="background:${fillToCss()}"></span><span class="nm">Background</span></div>`;
+  renderProps();
+  layers.forEach((l) => renderedLayerIds.add(l.id));
+  if (ch) {
+    propsPanel.classList.remove("in");
+    void propsPanel.offsetWidth;
+    propsPanel.classList.add("in");
+    // The entrance animation must play once per selection, not each time the panel is rebuilt
+    // (e.g. when clicking a gradient stop or a mode tab), so the class is removed once it has finished.
+    clearTimeout(propsAnimTimer);
+    propsAnimTimer = setTimeout(() => propsPanel.classList.remove("in"), 750);
+    if (selection) startSelectPulse();
+  }
+  silentNextUi = false;
+  syncHistoryButtons();
+  $("#em").hidden = layers.length > 0;
+  $$("#tl [data-tool]").forEach((b) => b.classList.toggle("on", b.dataset.tool == activeTool));
+  workspace.style.cursor = activeTool == "h" ? "grab" : "";
+  redraw();
+}
+const stopsToCss = (o = panelFill) =>
+  sortedStops(o)
+    .map((s) => `${s.c} ${s.p * 100}%`)
+    .join(",");
+const fillToCss = (o = panelFill) =>
+  o.mode == "none"
+    ? ""
+    : o.mode == "grad"
+      ? `linear-gradient(90deg,${stopsToCss(o)})`
+      : o.mode == "solid" || !o.k
+        ? o.color
+        : `url(${imageStore[o.k].src}) center/cover`;
+const layerList = $("#ll");
+layerList.onclick = (e) => {
+  const r = e.target.closest(".ly");
+  if (!r) return;
+  const id = r.dataset.id,
+    a = e.target.closest("[data-a]")?.dataset.a,
+    l = layers.find((x) => x.id == id);
+  if (a == "eye") {
+    l.v = l.v ? 0 : 1;
+    SND[l.v ? "on" : "off"]();
+    pushHistory();
+    renderUi();
+    return;
+  }
+  if (a == "dup") return duplicateLayer(l);
+  if (a == "del") {
+    r.classList.add("out");
+    setTimeout(() => deleteLayer(l), 170);
+    return;
+  }
+  if (selection != id) {
+    selection = id;
+    renderUi();
+  }
+};
+layerList.ondblclick = (e) => {
+  const n = e.target.closest(".nm"),
+    r = n && n.closest(".ly");
+  if (!r || r.classList.contains("bgr")) return;
+  n.contentEditable = true;
+  n.focus();
+  getSelection().selectAllChildren(n);
+};
+layerList.onfocusout = (e) => {
+  const n = e.target;
+  if (!n.isContentEditable) return;
+  const l = layers.find((x) => x.id == n.closest(".ly").dataset.id);
+  l.name = n.textContent.trim() || l.name;
+  pushHistory();
+  renderUi();
+};
+layerList.onkeydown = (e) => {
+  if (e.key == "Enter" && e.target.isContentEditable) {
+    e.preventDefault();
+    e.target.blur();
+  }
+};
+layerList.ondragstart = (e) => {
+  const r = e.target.closest(".ly");
+  if (!r || r.classList.contains("bgr")) {
+    e.preventDefault();
+    return;
+  }
+  draggedLayerId = r.dataset.id;
+  e.dataTransfer.setData("text/plain", "l");
+};
+layerList.ondragover = (e) => {
+  if (!draggedLayerId) return;
+  e.preventDefault();
+  $$(".ly").forEach((x) => x.classList.remove("dt"));
+  e.target.closest(".ly:not(.bgr)")?.classList.add("dt");
+};
+layerList.ondrop = (e) => {
+  e.preventDefault();
+  const r = e.target.closest(".ly:not(.bgr)");
+  if (r && draggedLayerId && r.dataset.id != draggedLayerId) {
+    const i = layers.findIndex((l) => l.id == draggedLayerId),
+      m = layers.splice(i, 1)[0];
+    layers.splice(
+      layers.findIndex((l) => l.id == r.dataset.id),
+      0,
+      m,
+    );
+    pushHistory();
+  }
+  draggedLayerId = null;
+  renderUi();
+};
+layerList.ondragend = () => {
+  draggedLayerId = null;
+  renderUi();
+};
+
+// ====================================================================================================
+// PROPERTIES PANEL
+// ====================================================================================================
+// Inputs are bound by path: data-p="l.st.t" edits the selected layer, data-p="fill.x" edits the fill being
+// edited (ring or background, see activeFill) and data-p="fm.on" the frame flags. See pathRoot/getPath/setPath.
+// For sliders, data-s is a scale factor (UI value x data-s = stored value, e.g. 0.01 for percentages).
+const sliderRow = (p, t, a, b, k = 1) =>
+  `<div class="r"><span>${t}</span><input type="range" data-p="${p}" data-s="${k}" min="${a}" max="${b}" step="1"><output></output></div>`;
+const numberField = (p, t) => `<label class="f">${t}<input type="number" data-p="${p}" step="1"></label>`;
+const colorField = (p) =>
+  `<div class="cc"><input type="color" data-p="${p}"><input class="hx" data-hex="${p}" maxlength="7"></div>`;
+function layerProps(l) {
+  let h = `<h3>Transform</h3><div class="g2">${numberField("l.x", "X")}${numberField("l.y", "Y")}${numberField("l.w", "Width")}${numberField("l.h", "Height")}${numberField("l.r", "Rotation °")}</div>${sliderRow("l.o", "Opacity", 0, 100, 0.01)}<div class="row"><button data-a="ctr:xy">Center</button><button data-a="ctr:x">Center H</button><button data-a="ctr:y">Center V</button></div><div class="row"><button class="pr" data-a="gd">Geometry Dash style</button></div><h3>Stroke<label class="sw"><input type="checkbox" data-p="l.st.on" data-r><i></i></label></h3>`;
+  if (l.st.on)
+    h += `${sliderRow("l.st.t", "Stroke width", 1, 100)}${sliderRow("l.st.ol", "Black outline", 0, 60)}<div class="r"><span>Color</span>${colorField("l.st.c")}</div><div class="r"><span>Position</span><select data-p="l.st.pos"><option value="out">Outside</option><option value="in">Inside</option></select></div>${sliderRow("l.st.q", "Smoothness", 1, 3)}`;
+  h += `<h3>Drop shadow<label class="sw"><input type="checkbox" data-p="l.sd.on" data-r><i></i></label></h3>`;
+  if (l.sd.on)
+    h += `${sliderRow("l.sd.o", "Opacity", 0, 100, 0.01)}${sliderRow("l.sd.x", "Offset X", -120, 120)}${sliderRow("l.sd.y", "Offset Y", -120, 120)}${sliderRow("l.sd.b", "Blur", 0, 40)}<div class="r"><span>Color</span>${colorField("l.sd.c")}</div>`;
+  return h;
+}
+function fillProps() {
+  const R = selection == "rg",
+    fill = activeFill(),
+    m = fill.mode;
+  let h =
+    (R
+      ? `<h3>Frame<label class="sw"><input type="checkbox" data-p="fm.on" data-r><i></i></label></h3><h3>Ring fill</h3>`
+      : "") +
+    `<div class="tabs">${[...(R ? [] : [["none", "None"]]), ["solid", "Solid"], ["grad", "Gradient"], ["img", "Image"]].map(([k, t]) => `<button data-a="mode:${k}" class="${m == k ? "on" : ""}">${t}</button>`).join("")}</div>`;
+  if (m == "none")
+    h +=
+      '<div class="row"><button data-a="bgimg" class="pr">Import background image</button></div><p class="mu">Or pick Solid, Gradient or Image above. With None, the inside of the frame stays transparent.</p>';
+  else if (m == "solid")
+    h += `<h3 style="margin-top:14px">Color</h3><div class="r">${colorField("fill.color")}</div><div class="g3">${["R", "G", "B"].map((c, i) => `<label class="f">${c}<input type="number" min="0" max="255" data-rgb="${i}"></label>`).join("")}</div>`;
+  else if (m == "grad") {
+    selectedStop = Math.min(selectedStop, fill.s.length - 1);
+    h += `<h3 style="margin-top:14px">Gradient</h3><div class="r"><span>Type</span><select data-p="fill.t" data-r><option value="linear">Linear</option><option value="radial">Radial</option></select></div>${fill.t == "linear" ? sliderRow("fill.a", "Angle", 0, 360) : ""}<div id="gb" class="gb"></div><div class="mu" style="font-size:11px">Click the bar to add a stop · drag to move</div><div class="r"><span>Stop color</span>${colorField("fill.s." + selectedStop + ".c")}<button data-a="delstop" ${fill.s.length < 3 ? "disabled" : ""}>${icon(ICON_TRASH)}</button></div>${sliderRow("fill.s." + selectedStop + ".p", "Position", 0, 100, 0.01)}<h3>Presets</h3><div class="pre">${GRADIENT_PRESETS.map((p, i) => `<button data-a="pre:${i}" style="background:linear-gradient(90deg,${p[2].join(",")})">${p[0]}</button>`).join("")}</div>`;
+  } else
+    h +=
+      `<div class="row"><button data-a="bgimg" class="pr">Upload image</button></div>` +
+      (fill.k
+        ? `<div class="row">${["fit", "fill", "stretch", "center"].map((f) => `<button data-a="fit:${f}" class="${fill.fit == f ? "on" : ""}">${f[0].toUpperCase() + f.slice(1)}</button>`).join("")}</div>${sliderRow("fill.x", "Position X", -1024, 1024)}${sliderRow("fill.y", "Position Y", -1024, 1024)}${sliderRow("fill.sc", "Scale", 10, 400, 0.01)}${sliderRow("fill.r", "Rotation", -180, 180)}<div class="row"><button data-a="bgc">Center</button></div>`
+        : '<p class="mu">Upload an image to use as background.</p>');
+  return h;
+}
+function renderProps() {
+  const l = currentLayer(),
+    P = $("#pp");
+  P.innerHTML =
+    selection == "bg" || selection == "rg"
+      ? fillProps()
+      : l
+        ? layerProps(l)
+        : '<p class="mu">Select a layer or import an image.</p>';
+  syncInputs();
+  renderStopBar();
+}
+const activeFill = () => (selection == "rg" ? ringFill : panelFill),
+  pathRoot = (k) => (k == "l" ? currentLayer() : k == "fm" ? frameOpts : activeFill());
+function getPath(p) {
+  const a = p.split(".");
+  let o = pathRoot(a[0]);
+  for (let i = 1; i < a.length; i++) o = o?.[a[i]];
+  return o;
+}
+function setPath(p, v) {
+  const a = p.split(".");
+  let o = pathRoot(a[0]);
+  for (let i = 1; i < a.length - 1; i++) o = o[a[i]];
+  o[a[a.length - 1]] = v;
+}
+function syncInputs() {
+  $$("#pp [data-p]").forEach((el) => {
+    if (el == document.activeElement && el.type == "number") return;
+    const v = getPath(el.dataset.p);
+    if (v == null) return;
+    if (el.type == "checkbox") el.checked = !!v;
+    else if (el.type == "range") {
+      const k = +el.dataset.s;
+      el.value = v / k;
+      if (el.nextElementSibling) el.nextElementSibling.textContent = Math.round(v / k);
+    } else if (el.type == "number") el.value = Math.round(v * 10) / 10;
+    else el.value = v;
+    if (el.type == "color" && el.nextElementSibling) el.nextElementSibling.value = v;
+  });
+  $$("#pp [data-hex]").forEach((el) => (el.value = getPath(el.dataset.hex)));
+  $$("#pp [data-rgb]").forEach((el) => (el.value = hexToRgb(activeFill().color)[el.dataset.rgb]));
+}
+function renderStopBar() {
+  const b = $("#gb");
+  if (!b) return;
+  b.style.background = `linear-gradient(90deg,${stopsToCss(activeFill())})`;
+  b.innerHTML = activeFill()
+    .s.map(
+      (s, i) =>
+        `<i class="gs${i == selectedStop ? " on" : ""}" data-i="${i}" style="left:${s.p * 100}%;background:${s.c}"></i>`,
+    )
+    .join("");
+}
+const propsPanel = $("#pp");
+propsPanel.addEventListener("input", (e) => {
+  const el = e.target,
+    p = el.dataset.p;
+  if (!p) return;
+  let v;
+  if (el.type == "checkbox") v = el.checked;
+  else if (el.type == "range" || el.type == "number")
+    v = el.value === "" ? 0 : +el.value * (+el.dataset.s || 1);
+  else v = el.value;
+  if (el.type == "range" && el.nextElementSibling) el.nextElementSibling.textContent = Math.round(el.value);
+  setPath(p, v);
+  if (el.type == "color") el.nextElementSibling.value = el.value;
+  renderStopBar();
+  redraw();
+});
+propsPanel.addEventListener("change", (e) => {
+  const el = e.target;
+  if (el.dataset.hex) {
+    if (/^#[0-9a-f]{6}$/i.test(el.value)) setPath(el.dataset.hex, el.value.toLowerCase());
+  } else if (el.dataset.rgb) {
+    const o = activeFill(),
+      c = hexToRgb(o.color);
+    c[el.dataset.rgb] = +el.value;
+    o.color = rgbToHex(c);
+  } else if (!el.dataset.p) return;
+  pushHistory();
+  renderUi();
+});
+propsPanel.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-a]");
+  if (!b) return;
+  const [a, v] = b.dataset.a.split(":"),
+    fill = activeFill();
+  if (a == "ctr") {
+    centerLayer(currentLayer(), v);
+    return;
+  } else if (a == "gd") {
+    const l = currentLayer();
+    Object.assign(l.st, GD_STROKE);
+    l.sd = {
+      ...GD_SHADOW,
+    };
+  } else if (a == "mode") {
+    fill.mode = v;
+    if (v == "img" && !fill.k) $("#bf").click();
+  } else if (a == "fit") {
+    fill.fit = v;
+    if (v == "center") {
+      fill.x = fill.y = 0;
+    }
+  } else if (a == "pre") {
+    const q = GRADIENT_PRESETS[v];
+    fill.a = q[1];
+    fill.s = evenStops(q[2]);
+    selectedStop = 0;
+  } else if (a == "delstop") {
+    fill.s.splice(selectedStop, 1);
+    selectedStop = 0;
+  } else if (a == "bgimg") return $("#bf").click();
+  else if (a == "bgc") {
+    fill.x = fill.y = 0;
+    fill.sc = 1;
+    fill.r = 0;
+  }
+  pushHistory();
+  renderUi();
+});
+const barPosition = (e) => {
+  const R = $("#gb").getBoundingClientRect();
+  return Math.min(1, Math.max(0, (e.clientX - R.left) / R.width));
+};
+function colorAt(p) {
+  const s = sortedStops(activeFill());
+  if (p <= s[0].p) return s[0].c;
+  for (let i = 1; i < s.length; i++)
+    if (p <= s[i].p) {
+      const t = (p - s[i - 1].p) / (s[i].p - s[i - 1].p || 1),
+        a = hexToRgb(s[i - 1].c),
+        b = hexToRgb(s[i].c);
+      return rgbToHex(a.map((v, j) => v + (b[j] - v) * t));
+    }
+  return s[s.length - 1].c;
+}
+propsPanel.addEventListener("pointerdown", (e) => {
+  const b = e.target.closest("#gb");
+  if (!b) return;
+  b.setPointerCapture(e.pointerId);
+  const s = e.target.closest(".gs");
+  if (s) selectedStop = +s.dataset.i;
+  else {
+    const p = barPosition(e),
+      B = activeFill();
+    B.s.push({
+      p,
+      c: colorAt(p),
+    });
+    selectedStop = B.s.length - 1;
+  }
+  draggingStop = true;
+  renderStopBar();
+  redraw();
+});
+propsPanel.addEventListener("pointermove", (e) => {
+  if (!draggingStop) return;
+  activeFill().s[selectedStop].p = barPosition(e);
+  renderStopBar();
+  redraw();
+});
+propsPanel.addEventListener("pointerup", () => {
+  if (draggingStop) {
+    draggingStop = false;
+    pushHistory();
+    renderUi();
+  }
+});
+$("#un").onclick = undo;
+$("#re").onclick = redo;
+$("#im").onclick = $("[data-act=import]").onclick = () => $("#fi").click();
+$("#tr").onchange = redraw;
+$("[data-act=bg]").onclick = () => {
+  selection = "bg";
+  renderUi();
+};
+$("[data-act=fm]").onclick = () => {
+  selection = "rg";
+  renderUi();
+};
+$("[data-act=bgi]").onclick = () => {
+  selection = "bg";
+  renderUi();
+  $("#bf").click();
+};
+$("[data-act=ctr]").onclick = () => centerLayer(currentLayer());
+$("[data-act=cov]").onclick = () => {
+  const l = currentLayer();
+  if (l) {
+    const f = Math.min(S / l.w, S / l.h);
+    l.w *= f;
+    l.h *= f;
+    l.x = l.y = S / 2;
+    l.r = 0;
+    pushHistory();
+    renderUi();
+  }
+};
+$$("[data-tool]").forEach(
+  (b) =>
+    (b.onclick = () => {
+      activeTool = b.dataset.tool;
+      renderUi();
+    }),
+);
+$("#ex").onclick = async () => {
+  const c = makeCanvas(S, S);
+  render(c.getContext("2d"), true);
+  const b = await new Promise((r) => c.toBlob(r, "image/png"));
+  SND.done();
+  try {
+    const d = await window.claude?.use("downloads");
+    if (!d) throw 0;
+    await d.save({
+      filename: "geode-logo.png",
+      data: b,
+    });
+  } catch (e) {
+    if (e && e.code == "declined") return;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(b);
+    a.download = "geode-logo.png";
+    a.click();
+  }
+};
+propsPanel.addEventListener("change", (e) => {
+  if (e.target.type == "checkbox") SND[e.target.checked ? "on" : "off"]();
+});
+propsPanel.addEventListener("click", (e) => {
+  if (e.target.closest("[data-a=gd]")) SND.add();
+});
+document.addEventListener("click", (e) => {
+  if (
+    e.target.closest("#tl button,.tabs button,.zc button:not(#snd),.pre button,.row button:not([data-a=gd])")
+  )
+    SND.tap();
+});
+
+
+// ====================================================================================================
+// VECTOR FRAME (inline SVG preview of frame, ring and background)
+// ====================================================================================================
+function roundRectPath(i, r) {
+  const a = i,
+    b = S - i;
+  return `M${a + r} ${a}H${b - r}A${r} ${r} 0 0 1 ${b} ${a + r}V${b - r}A${r} ${r} 0 0 1 ${b - r} ${b}H${a + r}A${r} ${r} 0 0 1 ${a} ${b - r}V${a + r}A${r} ${r} 0 0 1 ${a + r} ${a}Z`;
+}
+const fillImageCache = {};
+let frameKey = "";
+function frameSvg() {
+  const T = $("#tr").checked,
+    defs = [],
+    body = [];
+  const paint = (o, id, box) => {
+    if (o.mode == "none") return null;
+    if (o.mode == "solid")
+      return {
+        fill: o.color,
+      };
+    if (o.mode == "grad") {
+      const st = sortedStops(o)
+        .map((s) => `<stop offset="${Math.min(1, Math.max(0, s.p))}" stop-color="${s.c}"/>`)
+        .join("");
+      if (o.t == "radial")
+        defs.push(
+          `<radialGradient id="${id}" gradientUnits="userSpaceOnUse" cx="512" cy="512" r="${S * 0.7071}">${st}</radialGradient>`,
+        );
+      else {
+        const [x1, y1, x2, y2] = gradLine(o.a);
+        defs.push(
+          `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${st}</linearGradient>`,
+        );
+      }
+      return {
+        fill: `url(#${id})`,
+      };
+    }
+    const key = JSON.stringify(o) + box,
+      e = fillImageCache[id];
+    if (!e || e.key != key) {
+      const c = makeCanvas(S, S);
+      paintBg(c.getContext("2d"), o, box);
+      fillImageCache[id] = {
+        key,
+        url: c.toDataURL("image/png"),
+      };
+    }
+    return {
+      img: fillImageCache[id].url,
+    };
+  };
+  const shape = (p, d, rule, cid) => {
+    if (!p) return;
+    if (p.fill) body.push(`<path fill-rule="${rule}" fill="${p.fill}" d="${d}"/>`);
+    else {
+      defs.push(`<clipPath id="${cid}"><path clip-rule="${rule}" d="${d}"/></clipPath>`);
+      body.push(
+        `<image clip-path="url(#${cid})" width="${S}" height="${S}" preserveAspectRatio="none" href="${p.img}"/>`,
+      );
+    }
+  };
+  if (frameOpts.on) {
+    const P = roundRectPath(...FRAME.panel);
+    body.push(
+      T
+        ? `<path fill-rule="evenodd" fill="#000" d="${roundRectPath(...FRAME.outer)} ${P}"/>`
+        : `<path fill="#000" d="${roundRectPath(...FRAME.outer)}"/>`,
+    );
+    shape(paint(ringFill, "f-gr", S), roundRectPath(...FRAME.ring) + P, "evenodd", "f-cr");
+    if (!T) {
+      shape(paint(panelFill, "f-gb", PANEL_SIZE), P, "nonzero", "f-cp");
+      if (panelFill.mode == "solid") {
+        defs.push(
+          `<linearGradient id="f-ov" gradientUnits="userSpaceOnUse" x1="0" y1="${FRAME.panel[0]}" x2="0" y2="${S - FRAME.panel[0]}"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".035"/></linearGradient>`,
+        );
+        body.push(`<path fill="url(#f-ov)" d="${P}"/>`);
+      }
+    }
+  } else if (!T) shape(paint(panelFill, "f-gb", S), `M0 0H${S}V${S}H0Z`, "nonzero", "f-cb");
+  return `<defs>${defs.join("")}</defs>${body.join("")}`;
+}
+function syncFrameSvg() {
+  const k = JSON.stringify([panelFill, ringFill, frameOpts, $("#tr").checked]);
+  if (k == frameKey) return;
+  frameKey = k;
+  $("#fr").innerHTML = frameSvg();
+}
+
+// ====================================================================================================
+// INTERACTIVE TUTORIAL: spotlight + step card + a fake mouse that glides to each control
+// ====================================================================================================
+// The fake cursor is driven in two layers, like a "smooth camera" in a screen recorder:
+//   1. tourAim travels along an eased curve (bezier) towards the target;
+//   2. the cursor itself follows tourAim through a damped spring, so it eases in/out and lags a little;
+//   its rotation is a second spring that leans the arrow into the direction it is travelling.
+var propsAnimTimer;
+const TOUR_STEPS = [
+  { welcome: true, title: "Welcome to Geode Logo Maker", text: "Build 1024×1024 logos for your Geode mods. This short tour shows every tool: a fake mouse will point things out." },
+  { sel: "#tl [data-tool=v]", title: "Select & transform", text: "Click a layer to select it. Drag to move, drag the corners to scale and the round handle to rotate (Shift snaps to 15°, Alt turns snapping off)." },
+  { sel: "#tl [data-tool=h]", title: "Pan", text: "Hold Space or use this tool to pan. Scroll the mouse wheel, or pinch on a phone, to zoom." },
+  { sel: "#tl [data-act=import]", title: "Import images", text: "Add PNG, JPG or WebP files, or just drop them on the canvas. Every image becomes its own layer." },
+  { sel: "#tl [data-act=bg]", title: "Background", text: "The area inside the frame: a solid colour, a fully editable gradient (click the bar to add stops) or your own image." },
+  { sel: "#tl [data-act=fm]", title: "Frame ring", text: "The coloured ring has its own fill. You can also turn the whole frame off." },
+  { sel: "#tl [data-act=ctr]", title: "Perfect centering", text: "Centres the visible pixels of the selected layer, ignoring transparent padding. “Fit layer to canvas” is the button next to it." },
+  { sel: "#ll", at: "tl", title: "Layers", text: "Click to select, drag to reorder, double-click to rename. The eye hides a layer, the copy icon duplicates it and the bin deletes it." },
+  { sel: "#pp", at: "tl", title: "Properties", text: "Exact position, size, rotation and opacity, plus the “Geometry Dash style” button: black outline, white stroke and the soft shadow in one click." },
+  { sel: ".zc", title: "Zoom & sound", text: "Zoom in and out, fit the canvas or jump to 100%. The speaker icon mutes the interface sounds." },
+  { sel: "header .ck", title: "Transparent background", text: "Hides the inside of the frame, so the exported PNG is transparent there." },
+  { sel: "#ex", title: "Export", text: "Saves a 1024×1024 PNG exactly as you see it." },
+  { welcome: true, last: true, title: "You're ready!", text: "Shortcuts: Ctrl+Z / Ctrl+Shift+Z undo and redo · Ctrl+D duplicate · Delete remove · arrow keys nudge · V / H tools · 0 fit view. Press ? or the help button to replay this tour." },
+];
+const tourState = { i: -1, on: false };
+const tourPhys = { x: 0, y: 0, vx: 0, vy: 0, r: 0, vr: 0, s: 1, vs: 0, st: 1 }; // cursor position, rotation, click squish
+const tourAim = { x: 0, y: 0 };
+let tourPath = null, tourRaf = 0, tourLast = 0, tourEl, tourHole, tourCard, tourCursor, tourRip;
+
+function buildTour() {
+  tourEl = document.createElement("div");
+  tourEl.id = "tour";
+  tourEl.innerHTML =
+    '<div id="tHole"></div><div id="tCard" role="dialog" aria-live="polite"></div><div id="tRip"></div>' +
+    '<svg id="tCur" width="34" height="34" viewBox="0 0 24 24"><path d="M13.64,21.97C13.14,22.21 12.54,22 12.31,21.5L10.13,16.76L7.62,18.78C7.45,18.92 7.24,19 7,19A1,1 0 0,1 6,18V3A1,1 0 0,1 7,2C7.24,2 7.47,2.09 7.64,2.23L7.65,2.22L19.14,11.86C19.57,12.22 19.62,12.85 19.27,13.27C19.12,13.45 18.91,13.57 18.7,13.61L15.54,14.23L17.74,18.96C18,19.46 17.76,20.05 17.26,20.28L13.64,21.97Z" fill="#ed8678" stroke="#160503" stroke-width="1.1" stroke-linejoin="round" paint-order="stroke"/></svg>';
+  document.body.appendChild(tourEl);
+  tourHole = $("#tHole");
+  tourCard = $("#tCard");
+  tourCursor = $("#tCur");
+  tourRip = $("#tRip");
+  tourCard.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-t]");
+    if (!b) return;
+    if (b.dataset.t == "next") tourGo(tourState.i + 1, 1);
+    else if (b.dataset.t == "back") tourGo(tourState.i - 1, -1);
+    else endTour();
+  });
+}
+
+function tourTargetRect(step) {
+  if (!step.sel) return null;
+  const el = document.querySelector(step.sel);
+  if (!el) return null;
+  if (el.scrollIntoView) el.scrollIntoView({ block: "nearest", inline: "nearest" });
+  const r = el.getBoundingClientRect();
+  return r.width < 2 || r.height < 2 ? null : r; // hidden on this screen size -> skip the step
+}
+
+function placeTourCard(r) {
+  const W = Math.min(320, innerWidth - 24);
+  tourCard.style.width = W + "px";
+  const H = tourCard.offsetHeight || 190, gap = 16;
+  let x = (innerWidth - W) / 2, y = (innerHeight - H) / 2;
+  if (r) {
+    const spots = [[r.right + gap, r.top], [r.left - W - gap, r.top], [r.left, r.bottom + gap], [r.left, r.top - H - gap]];
+    const fits = ([sx, sy]) => sx >= 8 && sx + W <= innerWidth - 8 && sy >= 8 && sy + H <= innerHeight - 8;
+    [x, y] = spots.find(fits) || [(innerWidth - W) / 2, innerHeight - H - 16];
+  }
+  x = Math.max(8, Math.min(innerWidth - W - 8, x));
+  y = Math.max(8, Math.min(innerHeight - H - 8, y));
+  tourCard.style.transform = `translate(${x}px,${y}px)`;
+}
+
+function tourGo(i, dir = 1) {
+  while (i >= 0 && i < TOUR_STEPS.length && TOUR_STEPS[i].sel && !tourTargetRect(TOUR_STEPS[i])) i += dir;
+  if (i >= TOUR_STEPS.length) return endTour();
+  if (i < 0) i = 0;
+  tourState.i = i;
+  const st = TOUR_STEPS[i], r = tourTargetRect(st), n = TOUR_STEPS.length;
+  tourCard.innerHTML =
+    `<button class="tc-x" data-t="skip" aria-label="Close tutorial">✕</button><div class="tc-step">${i + 1} / ${n}</div>` +
+    `<h4>${st.title}</h4><p>${st.text}</p><div class="tc-row"><div class="tc-dots">${TOUR_STEPS.map((_, k) => `<i class="${k == i ? "on" : ""}"></i>`).join("")}</div>` +
+    `<div class="tc-btns">${i > 0 && !st.last ? '<button data-t="back">Back</button>' : ""}<button class="pr" data-t="next">${i == 0 ? "Start tour" : st.last ? "Done" : "Next"}</button></div></div>`;
+  if (r) {
+    const pad = 6;
+    Object.assign(tourHole.style, { left: r.left - pad + "px", top: r.top - pad + "px", width: r.width + pad * 2 + "px", height: r.height + pad * 2 + "px" });
+  } else Object.assign(tourHole.style, { left: "50%", top: "50%", width: "0px", height: "0px" });
+  placeTourCard(r);
+  if (r) {
+    const big = st.at == "tl"; // big panels: point at their top-left area instead of the middle
+    const tx = big ? r.left + Math.min(80, r.width / 2) : r.left + r.width / 2;
+    const ty = big ? r.top + Math.min(60, r.height / 2) : r.top + r.height / 2;
+    humanMove(tx, ty, Math.min(r.width, r.height), tourClick);
+  } else startTourPath(innerWidth * 0.62, innerHeight * 0.68);
+  SND.tap();
+}
+
+function startTourPath(tx, ty, done, opt = {}) {
+  const a = { x: tourPhys.x, y: tourPhys.y }, dx = tx - a.x, dy = ty - a.y, dist = Math.hypot(dx, dy) || 1;
+  // curved arc whose side and size change every time, like a real hand
+  const bend = opt.bend ?? Math.min(120, dist * 0.22) * (Math.random() < 0.5 ? 1 : -1) * (0.6 + Math.random() * 0.8);
+  const c = { x: (a.x + tx) / 2 - (dy / dist) * bend, y: (a.y + ty) / 2 + (dx / dist) * bend };
+  tourPath = {
+    a, c, b: { x: tx, y: ty },
+    t0: performance.now() + (opt.delay ?? 200 + Math.random() * 200),
+    d: opt.d ?? Math.max(650, dist * 1.1 + 350) * (0.85 + Math.random() * 0.3), // slightly different speed each time
+    done,
+  };
+}
+
+// Humans never land exactly on the target: first they miss by a few pixels, then make a tiny correction,
+// and the click still happens at least 3px away from the exact centre. (Both misses point the same way, so
+// the correction never passes through the perfect centre.)
+function humanMove(tx, ty, minDim, done) {
+  const ang = Math.random() * Math.PI * 2, m2 = 3.5 + Math.random() * 2.5;
+  const m1 = Math.min(Math.max(m2 + 2.5, 6 + Math.random() * 6), Math.max(m2 + 2.5, minDim * 0.3));
+  const ang2 = ang + (0.3 + Math.random() * 0.7) * (Math.random() < 0.5 ? 1 : -1);
+  startTourPath(tx + Math.cos(ang) * m1, ty + Math.sin(ang) * m1, () =>
+    startTourPath(tx + Math.cos(ang2) * m2, ty + Math.sin(ang2) * m2, done, { d: 260 + Math.random() * 140, delay: 60 + Math.random() * 120, bend: 0 }),
+  );
+}
+
+// Hand tremor: overlapping slow/fast sine waves with random phases (smooth, never visibly repeating).
+// The caller scales it by the cursor speed, so it only shows while moving.
+const tourSeed = Array.from({ length: 6 }, () => Math.random() * 6.28);
+function handShake(now) {
+  const t = now / 1000, s = tourSeed;
+  return {
+    x: Math.sin(t * 9.1 + s[0]) * 0.55 + Math.sin(t * 13.7 + s[1]) * 0.35 + Math.sin(t * 1.7 + s[2]) * 1.2,
+    y: Math.sin(t * 8.3 + s[3]) * 0.55 + Math.sin(t * 12.9 + s[4]) * 0.35 + Math.sin(t * 1.3 + s[5]) * 1.2,
+  };
+}
+
+function tourClick() {
+  tourPhys.st = 0.78; // squish the cursor, then let the spring bring it back
+  setTimeout(() => (tourPhys.st = 1), 130);
+  tourRip.style.left = tourPhys.x + "px";
+  tourRip.style.top = tourPhys.y + "px";
+  tourRip.classList.remove("go");
+  void tourRip.offsetWidth;
+  tourRip.classList.add("go");
+  SND.tap();
+}
+
+function tourFrame(now) {
+  if (!tourState.on) return;
+  const dt = Math.min(0.04, (now - tourLast) / 1000 || 0.016), p = tourPhys;
+  tourLast = now;
+  if (tourPath) {
+    const t = Math.max(0, Math.min(1, (now - tourPath.t0) / tourPath.d)),
+      e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, // ease in-out cubic
+      u = 1 - e, { a, c, b } = tourPath;
+    tourAim.x = u * u * a.x + 2 * u * e * c.x + e * e * b.x;
+    tourAim.y = u * u * a.y + 2 * u * e * c.y + e * e * b.y;
+    if (t >= 1 && tourPath.done) { const f = tourPath.done; tourPath.done = null; f(); }
+  }
+  const K = 120, C = 2 * Math.sqrt(K) * 0.9; // position spring (slightly under-damped = soft landing)
+  p.vx += ((tourAim.x - p.x) * K - p.vx * C) * dt;
+  p.vy += ((tourAim.y - p.y) * K - p.vy * C) * dt;
+  p.x += p.vx * dt;
+  p.y += p.vy * dt;
+  const lean = Math.max(-30, Math.min(30, p.vx * 0.035 + p.vy * 0.012)), KR = 140, CR = 2 * Math.sqrt(KR) * 0.7;
+  p.vr += ((lean - p.r) * KR - p.vr * CR) * dt;
+  p.r += p.vr * dt;
+  p.vs += ((p.st - p.s) * 300 - p.vs * 26) * dt;
+  p.s += p.vs * dt;
+  // Tremor only exists while the hand is MOVING: it grows with speed and fades to exactly zero when the cursor rests.
+  const speed = Math.hypot(p.vx, p.vy), k = Math.min(1, speed / 300) ** 0.8;
+  const sh = handShake(now), ux = p.vx / (speed || 1), uy = p.vy / (speed || 1);
+  const wob = Math.sin((now / 1000) * 11 + tourSeed[0]) * 1.8 * k; // wobble sideways, perpendicular to the direction of travel
+  const jx = sh.x * 1.4 * k - uy * wob, jy = sh.y * 1.4 * k + ux * wob;
+  tourCursor.style.transform = `translate(${p.x + jx}px,${p.y + jy}px) rotate(${p.r + jx * 0.6}deg) scale(${p.s}) translate(-9.2px,-3.5px)`;
+  tourRaf = requestAnimationFrame(tourFrame);
+}
+
+function startTour() {
+  if (!tourEl) buildTour();
+  tourEl.hidden = false;
+  tourState.on = true;
+  Object.assign(tourPhys, { x: innerWidth * 0.8, y: innerHeight * 0.85, vx: 0, vy: 0, r: 0, vr: 0, s: 1, vs: 0, st: 1 });
+  Object.assign(tourAim, { x: tourPhys.x, y: tourPhys.y });
+  tourCard.classList.add("nt");
+  tourGo(0);
+  void tourCard.offsetWidth;
+  tourCard.classList.remove("nt");
+  tourLast = performance.now();
+  cancelAnimationFrame(tourRaf);
+  tourRaf = requestAnimationFrame(tourFrame);
+}
+
+function endTour() {
+  tourState.on = false;
+  cancelAnimationFrame(tourRaf);
+  if (tourEl) tourEl.hidden = true;
+  try { localStorage.setItem("gtour", "1"); } catch {}
+}
+
+$("[data-act=tour]").onclick = startTour;
+addEventListener("resize", () => tourState.on && tourGo(tourState.i, 1));
+// While the tour is open it owns the keyboard (capture phase + stopImmediatePropagation keeps editor shortcuts quiet)
+addEventListener("keydown", (e) => {
+  if (!tourState.on) {
+    if (e.key == "?" && !e.target.matches?.("input,select,[contenteditable=true]")) startTour();
+    return;
+  }
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  if (e.key == "Escape") endTour();
+  else if (e.key == "ArrowRight" || e.key == "Enter" || e.key == " ") tourGo(tourState.i + 1, 1);
+  else if (e.key == "ArrowLeft") tourGo(tourState.i - 1, -1);
+}, true);
+// First visit: offer the tour once
+try { if (localStorage.getItem("gtour") !== "1") setTimeout(() => tourState.on || startTour(), 1200); } catch {}
+
+// ====================================================================================================
+// KEYBOARD SHORTCUTS + BOOT
+// ====================================================================================================
+addEventListener("keydown", (e) => {
+  if (e.target.matches?.("input,select,[contenteditable=true]")) return;
+  const m = e.ctrlKey || e.metaKey,
+    k = e.key.toLowerCase(),
+    l = currentLayer();
+  if (e.code == "Space" && !e.target.closest?.("button,a")) {
+    spaceHeld = true;
+    e.preventDefault();
+    return;
+  }
+  if (m && k == "z") {
+    e.preventDefault();
+    e.shiftKey ? redo() : undo();
+  } else if (m && k == "y") {
+    e.preventDefault();
+    redo();
+  } else if (m && k == "d") {
+    e.preventDefault();
+    l && duplicateLayer(l);
+  } else if (k == "delete" || k == "backspace") {
+    l && deleteLayer(l);
+  } else if (k == "v" && !m) {
+    activeTool = "v";
+    renderUi();
+  } else if (k == "h" && !m) {
+    activeTool = "h";
+    renderUi();
+  } else if (k == "0") {
+    fitView();
+  } else if (k == "+" || k == "=") {
+    zoomAt(1.25, workspace.clientWidth / 2, workspace.clientHeight / 2);
+  } else if (k == "-") {
+    zoomAt(0.8, workspace.clientWidth / 2, workspace.clientHeight / 2);
+  } else if (l && k.startsWith("arrow")) {
+    e.preventDefault();
+    const d = e.shiftKey ? 10 : 1;
+    if (k == "arrowleft") l.x -= d;
+    if (k == "arrowright") l.x += d;
+    if (k == "arrowup") l.y -= d;
+    if (k == "arrowdown") l.y += d;
+    pushHistory();
+    redraw();
+    syncInputs();
+  }
+});
+addEventListener("keyup", (e) => {
+  if (e.code == "Space") spaceHeld = false;
+});
+addEventListener("blur", () => {
+  spaceHeld = false;
+});
+new ResizeObserver(() => (userMovedView ? layoutView() : fitView())).observe(workspace);
+if (matchMedia("(prefers-reduced-motion:reduce)").matches) $("header svg").pauseAnimations?.();
+pushHistory();
+fitView();
+renderUi();
+
+</script></body></html>
